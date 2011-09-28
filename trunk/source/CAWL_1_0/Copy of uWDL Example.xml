@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uWDL xmlns="http://cs.ssu.ac.kr/uWDL/0.1alpha" version="0.1" log="0">
+<node name="User_search_service">
+	<service>
+		<wsdl>http://cs.ssu.ac.kr/axis/services/user_search_service.wsdl</wsdl>
+		<operation>verifyingUser</operation>
+	</service>
+</node>
+<link nodeName="User_search_service">
+	<case type="default">
+		<condition>
+			<context>
+				<rule priority="1">
+					<constraint>
+						<subject type="PersonType">A</subject>
+						<verb type="LocationType">Location</verb>
+						<object type="Roomtype">301</object>
+					</constraint>
+					<constraint composite="AND">
+						<subject type="PersonType">A</subject>
+						<verb type="SituationType">Situation</verb>
+						<object type="ConferenceType">presentation</object>
+					</constraint>
+					<constraint composite="AND">
+						<subject type="ConferenceType">presentation</subject>
+						<verb type="DateType">Date</verb> 
+						<object type="TimeType">10:00</object>
+					</constraint>
+				</rule>
+			</context>
+		</condition>
+		<action>
+			<export type="data">
+				<target>Download_files:ip_address</target>
+			</export>
+		</action>
+	</case>
+</link>
+<sink>result</sink>
+</uWDL>

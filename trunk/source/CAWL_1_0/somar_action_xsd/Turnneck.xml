@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Turnneck - 로봇 목 움직임-->
+<!--Direction : Top(상), bottom(하) / Left(좌), Right(우)-->
+<!--Angle : 움직임각도 범위는 -90<x<90-->
+<Turnneck xsi:noNamespaceSchemaLocation="Turnneck.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<Direction>Top</Direction>
+	<Angle>45</Angle>
+</Turnneck>

@@ -1,0 +1,39 @@
+javaDoc, doxij~~~
+xml 스키마 유효성 검사
+스키마를 보고 tree 생성하고 값 입력
+tree -> string xml 로 출력 함수
+
+mapper 에서 context 비교
+printnode 에서 node에 정보를 출력하고 웹 서비스를 호출 하는 부분이다 현재 호출하는거 대신 console에 출력하도록 코딩되어 있음
+somar_action_xsd 에 somar와 통신하는 스키마 정의 되어 있음
+
+
+
+문제1. uwdl로 되어야 subflow가 호출됨, subflow=true 는 있으나 마나 이건 뭐야 -_-
+<invoke serviceProvider="ssCom" portType="TeaPreparationPT" operation="TeaRobotService" subflow="true"/>
+  -> <invoke serviceProvider="uwdl" portType="TeaPreparationPT" operation="TeaRobotService" subflow="true"/>
+     위에 처럼 수정 
+    
+문제2. 각 flow, 노드, 조건 타입 등등 다 기술이 되어야 하는가? 고정적으로 되어있는데..
+
+문제3. 비교시에 3개 subject, verb, object 3개 스트링이 다 같은지 판단하여 비교하는데 이거도 좀 말이 안되는거 같음.
+
+문제4. 대박..기절하겟네.. AST트리에서 값을 읽어오는게 없음 응?? 이게 뭔 개소리??
+
+문제5. entities를 분리하는거 부터 다시 생각해야 할꺼 같다.
+      동사 문법이 섞여 있어서 좀 심각함
+      50 is NULL??
+      Tag를 activator, flow 단위나 다른 어떠한 기준에 단위로 비교할 단위를 정하는게 좋을거 같음
+
+문제6. 로봇 명령어 묶어서 보내야 할 경우에 묶을 방법이 없다. 구조체와 같은 개념이 필요 할 듯 하다.
+
+문제7. 웹서비스 호출 부분에 불필요한 type 같은거 삭제해도 무방 할꺼 같다.
+
+문제8. 병렬처리를 위한 키워드 같은게 필요하다. 
+
+문제9. 테이블을 객체 안에다가 전부 넣엇는데 따로 테이블을 하나로 빼는게 좋을꺼 같다.
+
+http://mwultong.blogspot.com/2006/09/java-exec-processbuilder.html
+http://blog.naver.com/genesis80mas?Redirect=Log&logNo=30004797737
+http://blog.naver.com/genesis80mas?Redirect=Log&logNo=30004798085
+

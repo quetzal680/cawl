@@ -1,0 +1,58 @@
+<uWDL version="0.1" log="0">
+	<source>Start</source>
+	<node name="User_search_service">
+		<service>
+			<wsdl>http://cs.ssu.ac.kr/axis/services/user_search_service.wsdl</wsdl>
+			<portType>--what--</portType>
+			<operation>verifyingUser</operation>
+		</service>
+	</node>
+	<node name="User_search_service2">
+		<service>
+			<wsdl>http://cs.ssu.ac.kr/axis/services/user_search_service.wsdl</wsdl>
+			<portType>--what--</portType>
+			<operation>verifyingUser</operation>
+		</service>
+	</node>
+	<link nodeName="User_search_service">
+		<case type="default">
+			<condition>
+				<context>
+					<rule>
+						<constraint>
+							<subject type="PersonType">John</subject>
+							<verb type="SituationType">presentation</verb>
+							<object type="LocationType">313</object>
+						</constraint>
+<!--						<constraint composite="or">
+							<subject type="PersonType">Tom</subject>
+							<verb type="SituationType">conference</verb>
+							<object type="LocationType">314</object>
+						</constraint>
+						<constraint>
+							<subject type="PersonType">A</subject>
+							<verb type="LocationType">Location</verb>
+							<object type="RoomType">301</object>
+						</constraint>
+						<constraint composite="AND">
+							<subject type="PersonType">A</subject>
+							<verb type="SituationType">Situation</verb>
+							<object type="ConferenceType">presentation</object>
+						</constraint>
+						<constraint composite="AND">
+							<subject type="ConferenceType">presentation</subject>
+							<verb type="DateType">Date</verb> 
+							<object type="TimeType">10:00</object>
+						</constraint>-->
+					</rule>
+				</context>
+			</condition>
+			<action>
+				<export type="data">
+					<port>E:\내 이클립스\uWDL Engine\test\test.ppt</port>
+				</export>
+			</action>
+		</case>
+	</link>
+	<sink>result</sink>
+</uWDL>

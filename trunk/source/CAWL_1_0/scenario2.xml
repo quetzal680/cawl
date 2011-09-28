@@ -1,0 +1,210 @@
+<uWDL version="0.1" log="0">
+	<source>source</source>
+
+	<node name="HomepageService_Computer01">
+		<service>
+			<wsdl>http://cs.ssu.ac.kr/axis/services/homepage_service.wsdl</wsdl>
+			<portType>tcp</portType>
+			<operation>iexplore</operation>
+		</service>
+	</node>
+
+	<node name="PresentationService_room101">
+		<service>
+			<wsdl>http://cs.ssu.ac.kr/axis/services/presentation_service.wsdl</wsdl>
+			<portType>tcp</portType>
+			<operation>presentation</operation>
+		</service>
+	</node>
+
+	<node name="PresentationMigrationService_room101_to_room102">
+		<service>
+			<wsdl>http://cs.ssu.ac.kr/axis/services/presentation_service.wsdl</wsdl>
+			<portType>tcp</portType>
+			<operation>migration</operation>
+		</service>
+	</node>
+
+	<node name="WashRoomService_play_rock">
+		<service>
+			<wsdl>http://cs.ssu.ac.kr/axis/services/washroom_service.wsdl</wsdl>
+			<portType>tcp</portType>
+			<operation>play_rock</operation>
+		</service>
+	</node>
+
+	<node name="ConsultingService_consultingRoom01">
+		<service>
+			<wsdl>http://cs.ssu.ac.kr/axis/services/consulting_service.wsdl</wsdl>
+			<portType>tcp</portType>
+			<operation>consulting</operation>
+		</service>
+	</node>
+
+	<link from="" to="HomepageService_Computer01">
+		<condition>
+			<context>
+				<rule>
+					<and>
+						<constraint>
+							<subject type="Person">ChulSu</subject>
+							<verb type="locatedIn"/>
+							<object type="OfficeRoom">officeRoom</object>
+						</constraint>
+						<constraint>
+							<subject type="Person">ChulSu</subject>
+							<verb type="loggedIn"/>
+							<object type="Computer">Computer01</object>
+						</constraint>
+					</and>
+				</rule>
+			</context>
+		</condition>
+	</link>
+
+	<link from="" to="PresentationService_room101">
+		<condition>
+			<context>
+				<rule>
+					<and>
+						<constraint>
+							<subject type="Person">ChulSu</subject>
+							<verb type="locatedIn"/>
+							<object type="MeetingRoom">room101</object>
+						</constraint>
+						<constraint>
+							<subject type="Person">ChulSu</subject>
+							<verb type="hasSchedule"/>
+							<object type="Schedule">meetingSchedule01</object>
+						</constraint>
+						<constraint>
+							<subject type="Schedule">meetingSchedule01</subject>
+							<verb type="hasActivity"/>
+							<object type="Presentation">presentation01</object>
+						</constraint>
+						<constraint>
+							<subject type="Schedule">meetingSchedule01</subject>
+							<verb type="hasPlace"/>
+							<object type="MeetingRoom">room101</object>
+						</constraint>							
+						<constraint>
+							<subject type="Schedule">meetingSchedule01</subject>
+							<verb type="startTime"/>
+							<object type="Time">t10am</object>
+						</constraint>
+						<constraint>
+							<subject type="City">Seoul</subject>
+							<verb type="currentTime"/>
+							<object type="Time">t10am</object>
+						</constraint>
+					</and>
+				</rule>
+			</context>
+		</condition>
+	</link>
+
+	<link from="" to="PresentationMigrationService_room101_to_room102">
+		<condition>
+			<context>
+				<rule>
+					<and>
+						<constraint>
+							<subject type="Person">ChulSu</subject>
+							<verb type="currentActivity"/>
+							<object type="Presentation">presentation01</object>
+						</constraint>
+						<constraint>
+							<subject type="Projector">projector01</subject>
+							<verb type="deviceStatus"/>
+							<object type="DeviceStatusValue">error</object>
+						</constraint>
+						<constraint>
+							<subject type="MeetingRoom">room102</subject>
+							<verb type="roomStatus"/>
+							<object type="RoomStatusValue">idle</object>
+						</constraint>
+						<constraint>
+							<subject type="Schedule">meetingSchedule01</subject>
+							<verb type="hasPlace"/>
+							<object type="MeetingRoom">room102</object>
+						</constraint>
+					</and>
+				</rule>
+			</context>
+		</condition>
+	</link>
+
+	<link from="" to="WashRoomService_play_rock">
+		<condition>
+			<context>
+				<rule>
+					<and>
+						<constraint>
+							<subject type="Person">ChulSu</subject>
+							<verb type="locatedIn"/>
+							<object type="WashRoom">washRoom</object>
+						</constraint>
+						<constraint>
+							<subject type="Person">ChulSu</subject>
+							<verb type="hasPreference"/>
+							<object type="Preference">musicPreference01</object>
+						</constraint>
+						<constraint>
+							<subject type="Preference">musicPreference01</subject>
+							<verb type="userDesire"/>
+							<object type="MusicGenre">Rock</object> <!-- ADDED: MusicGenre type -->
+						</constraint>
+					</and>
+				</rule>
+			</context>
+		</condition>
+	</link>
+
+	<link from="" to="ConsultingService_consultingRoom01">
+		<condition>
+			<context>
+				<rule>
+					<and>
+						<constraint>
+							<subject type="Person">ChulSu</subject>
+							<verb type="hasSchedule"/>
+							<object type="Schedule">consultingSchedule01</object>
+						</constraint>
+						<constraint>
+							<subject type="Schedule">consultingSchedule01</subject>
+							<verb type="hasPlace"/>
+							<object type="ConsultingRoom">consultingRoom01</object>
+						</constraint>
+						<constraint>
+							<subject type="Schedule">consultingSchedule01</subject>
+							<verb type="hasActivity"/>
+							<object type="Consulting">consulting01</object>
+						</constraint>
+						<constraint>
+							<subject type="Schedule">consultingSchedule01</subject>
+							<verb type="startTime"/>
+							<object type="Time">t03pm</object>
+						</constraint>
+						<constraint>
+							<subject type="Consulting">consulting01</subject>
+							<verb type="hasCustomer"/>
+							<object type="Person">John</object>
+						</constraint>
+						<constraint>
+							<subject type="Person">John</subject>
+							<verb type="locatedIn"/>
+							<object type="ConsultingRoom">consultingRoom01</object>
+						</constraint>
+						<constraint>
+							<subject type="Computer">Computer02</subject>
+							<verb type="locatedIn"/>
+							<object type="ConsultingRoom">consultingRoom01</object>
+						</constraint>
+					</and>
+				</rule>
+			</context>
+		</condition>
+	</link>
+
+	<sink>sink</sink>
+</uWDL>

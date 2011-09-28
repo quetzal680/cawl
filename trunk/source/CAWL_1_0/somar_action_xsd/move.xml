@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Data xsi:noNamespaceSchemaLocation="Data.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<Move>
+		<AxisX>10</AxisX>
+		<AxisY>20</AxisY>
+	</Move>
+	<Pickup>
+		<Height>10</Height>
+		<Distance>20</Distance>
+	</Pickup>
+	<Command>
+		<A>a</A>
+	</Command>
+</Data>

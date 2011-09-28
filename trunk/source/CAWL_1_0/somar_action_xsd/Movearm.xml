@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Movearm - 팔움직임-->
+<!--Side : Left(왼쪽팔) / Right(오른쪽팔)-->
+<!--AxisX : X축 위치 단위는 mm-->
+<!--AxisY : Y축 위치 단위는 mm-->
+<!--AxisZ : Z축 위치 단위는 mm-->
+<Movearm xsi:noNamespaceSchemaLocation="Movearm.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<Side>Right</Side>
+	<AxisX>200</AxisX>
+	<AxisY>400</AxisY>
+	<AxisZ>100</AxisZ>
+</Movearm>
