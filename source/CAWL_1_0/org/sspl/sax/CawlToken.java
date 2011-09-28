@@ -1,0 +1,54 @@
+package org.sspl.sax;
+
+public enum CawlToken {
+	CAWL, 
+	BASEONTOLOGIES, 
+	DOCUMENTATION,
+	ONTOLOGY,
+	SERVICEPROVIDERTYPE,
+	PORTTYPE,
+	SERVICEPROVIDER,
+	LOCATOR,
+	MESSAGE,
+	PART,
+	VARIABLE,
+	INITIALIZE,
+	FROM,
+	ACTIVATOR,
+	CONDITION,
+	CASE,
+	EVENT,
+	CONTEXT,
+	RULE,
+	CONSTRAINT,
+	SUBJECT,
+	VERB,
+	OBJECT,
+	ACTIVATE,
+	DEACTIVATE,
+	FLOW,
+	SOURCE,
+	INPUT,
+	NODE,
+	COPY,
+	TO,
+	INVOKE,
+	WAIT,
+	CATCH,
+	LINK,
+	SINK,
+	OUTPUT,
+	PARALLEL,
+	TRANSITION,
+	SYNCHRONIZE,
+	NSYNC,
+	NOVALUE;
+	
+	public static CawlToken value(String str) {
+		try {
+			return valueOf(str);
+		} catch (Exception e) {
+			return NOVALUE;
+		}
+	}
+}

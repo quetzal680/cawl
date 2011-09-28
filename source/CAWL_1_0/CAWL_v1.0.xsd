@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 sp1 (http://www.altova.com) by focusChoi (EMBRACE) -->
+<!-- edited with XML Spy v4.3 U (http://www.xmlspy.com) by Jongsun Choi (Soongsil University) -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:uflow="http://www.uflow.org/CAWL1.0" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.uflow.org/CAWL1.0" elementFormDefault="qualified">
+	<import namespace="http://schemas.xmlsoap.org/wsdl/" schemaLocation="http://schemas.xmlsoap.org/wsdl/"/>
+	<element name="CAWL" type="uflow:uWDLType"/>
+	<complexType name="documentationType">
+		<sequence>
+			<element name="documentation" minOccurs="0">
+				<complexType mixed="true">
+					<sequence>
+						<any minOccurs="0" maxOccurs="unbounded"/>
+					</sequence>
+				</complexType>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="uWDLType">
+		<complexContent>
+			<extension base="uflow:documentationType">
+				<sequence>
+					<element name="baseOntologies">
+						<complexType>
+							<sequence>
+								<element name="ontology" type="uflow:ontologyType" maxOccurs="unbounded"/>
+							</sequence>
+						</complexType>
+					</element>
+					<element name="serviceProviderType" type="uflow:serviceProviderTypeType" minOccurs="0" maxOccurs="unbounded"/>
+					<element name="serviceProvider" type="uflow:serviceProviderType" minOccurs="0" maxOccurs="unbounded"/>
+					<element name="message" type="uflow:messageType" minOccurs="0" maxOccurs="unbounded"/>
+					<element name="variable" type="uflow:variableType" minOccurs="0" maxOccurs="unbounded"/>
+					<element name="activator" type="uflow:activatorType" minOccurs="0" maxOccurs="unbounded"/>
+					<element name="flow" type="uflow:flowType" maxOccurs="unbounded"/>
+				</sequence>
+				<attribute name="name" type="NCName"/>
+				<attribute name="targetNamespace" type="anyURI"/>
+				<attribute name="version" type="string"/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="ontologyType">
+		<complexContent>
+			<extension base="uflow:documentationType">
+				<attribute name="location" type="anyURI" use="required"/>
+				<attribute name="namespace" type="anyURI" use="required"/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="serviceProviderTypeType">
+		<complexContent>
+			<extension base="uflow:documentationType">
+				<sequence>
+					<element name="portType" type="uflow:portTypeType" minOccurs="0" maxOccurs="unbounded"/>
+				</sequence>
+				<attribute name="name" type="NCName" use="required"/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="serviceProviderType">
+		<complexContent>
+			<extension base="uflow:documentationType">
+				<sequence>
+					<element name="locator" type="uflow:locatorType"/>
+				</sequence>
+				<attribute name="name" type="NCName" use="required"/>
+				<attribute name="type" type="QName" use="required"/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="locatorType">
+		<sequence>
+			<any namespace="##other" minOccurs="0" maxOccurs="unbounded"/>
+		</sequence>
+		<attribute name="type">
+			<simpleType>
+				<restriction base="string">
+					<enumeration value="static"/>
+					<enumeration value="UDDI"/>
+				</restriction>
+			</simpleType>
+		</attribute>
+		<attribute name="service" type="QName"/>
+	</complexType>
+	<complexType name="portTypeType">
+		<complexContent>
+			<extension base="wsdl:tPortType">
+				<sequence>
+					<element name="import" minOccurs="0" maxOccurs="unbounded">
+						<complexType>
+							<attribute name="portType" type="QName"/>
+							<attribute name="operation" type="NCName"/>
+						</complexType>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="messageType">
+		<complexContent>
+			<extension base="uflow:documentationType">
+				<sequence>
+					<element name="part" type="uflow:partType" minOccurs="0" maxOccurs="unbounded"/>
+				</sequence>
+				<attribute name="name" type="NCName" use="required"/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="partType">
+		<complexContent>
+			<extension base="uflow:documentationType">
+				<attribute name="name" type="NCName" use="required"/>
+				<attribute name="element" type="QName" use="optional"/>
+				<attribute name="type" type="QName" use="optional"/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="variableType">
+		<complexContent>
+			<extension base="uflow:documentationType">
+				<sequence>
+					<element name="initialize" type="uflow:initializeType" minOccurs="0" maxOccurs="unbounded"/>
+				</sequence>
+				<attribute name="name" type="NCName" use="required"/>
+				<attribute name="type" type="QName" use="required"/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="initializeType">
+		<sequence>
+			<element name="from" type="uflow:fromType"/>
+		</sequence>
+		<attribute name="part" type="NCName" use="required"/>
+	</complexType>
+	<complexType name="fromType">
+		<attribute name="variable" type="QName" use="optional"/>
+		<attribute name="part" type="NCName" use="optional"/>
+		<attribute name="expression" type="xsd:string" use="optional"/>
+	</complexType>
+	<complexType name="activatorType">
+		<complexContent>
+			<extension base="uflow:documentationType">
+				<sequence>
+					<element name="condition" type="uflow:conditionType"/>
+					<element name="activate" type="uflow:activateType" minOccurs="0" maxOccurs="unbounded"/>
+					<element name="deactivate" type="uflow:deactivateType" minOccurs="0" maxOccurs="unbounded"/>
+				</sequence>
+				<attribute name="name" type="xsd:string" use="required"/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="conditionType">
+		<complexContent>
+			<extension base="uflow:documentationType">
+				<sequence>
+					<element name="case" type="uflow:caseType" minOccurs="0" maxOccurs="unbounded"/>
+					<element name="context" minOccurs="0">
+						<complexType>
+							<complexContent>
+								<extension base="uflow:contextType">
+									<attribute name="priority" type="string" use="optional"/>
+								</extension>
+							</complexContent>
+						</complexType>
+					</element>
+				</sequence>
+				<attribute name="expression" type="xsd:string" use="optional"/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="caseType">
+		<complexContent>
+			<extension base="uflow:documentationType">
+				<sequence>
+					<element name="event" type="uflow:eventType" minOccurs="0"/>
+				</sequence>
+				<attribute name="name" type="NCName" use="optional"/>
+				<attribute name="expression" type="xsd:string" use="optional"/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="eventType">
+		<complexContent>
+			<extension base="uflow:documentationType">
+				<attribute name="serviceProvider" type="QName" use="required"/>
+				<attribute name="portType" type="NCName" use="required"/>
+				<attribute name="operation" type="NCName" use="required"/>
+				<attribute name="output" type="QName" use="required"/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="contextType">
+		<complexContent>
+			<extension base="uflow:documentationType">
+				<sequence>
+					<element name="rule" maxOccurs="unbounded">
+						<complexType>
+							<complexContent>
+								<extension base="uflow:ruleType">
+									<attribute name="expression" type="string" use="optional"/>
+								</extension>
+							</complexContent>
+						</complexType>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="ruleType">
+		<complexContent>
+			<extension base="uflow:documentationType">
+				<sequence>
+					<element name="constraint" maxOccurs="unbounded">
+						<complexType>
+							<complexContent>
+								<extension base="uflow:constraintType">
+									<attribute name="restriction" type="xsd:string" use="optional"/>
+								</extension>
+							</complexContent>
+						</complexType>
+					</element>
+				</sequence>
+				<attribute name="contribute" use="optional" default="positive">
+					<annotation>
+						<documentation>positive or nagative</documentation>
+					</annotation>
+					<simpleType>
+						<restriction base="xsd:string">
+							<enumeration value="positive"/>
+							<enumeration value="negative"/>
+						</restriction>
+					</simpleType>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="constraintType">
+		<all>
+			<element name="subject" type="uflow:subjectType"/>
+			<element name="verb" type="xsd:string"/>
+			<element name="object" type="uflow:objectType"/>
+		</all>
+		<attribute name="name" type="NCName" use="optional"/>
+	</complexType>
+	<complexType name="subjectType">
+		<simpleContent>
+			<extension base="xsd:string">
+				<attribute name="type" type="string" use="optional"/>
+			</extension>
+		</simpleContent>
+	</complexType>
+	<complexType name="objectType">
+		<simpleContent>
+			<extension base="xsd:string">
+				<attribute name="type" type="QName" use="optional"/>
+			</extension>
+		</simpleContent>
+	</complexType>
+	<complexType name="activateType">
+		<complexContent>
+			<extension base="uflow:documentationType">
+				<attribute name="activator" type="QName" use="optional"/>
+				<attribute name="flow" type="QName" use="optional"/>
+				<attribute name="input" type="QName" use="optional"/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="deactivateType">
+		<complexContent>
+			<extension base="uflow:documentationType">
+				<attribute name="activator" type="QName" use="optional"/>
+				<attribute name="flow" type="QName" use="optional"/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="flowType">
+		<complexContent>
+			<extension base="uflow:documentationType">
+				<sequence>
+					<element name="message" type="uflow:messageType" minOccurs="0" maxOccurs="unbounded"/>
+					<element name="variable" type="uflow:variableType" minOccurs="0" maxOccurs="unbounded"/>
+					<element name="source">
+						<complexType>
+							<complexContent>
+								<extension base="uflow:sourceType">
+									<attribute name="name" type="string" use="optional"/>
+								</extension>
+							</complexContent>
+						</complexType>
+					</element>
+					<element name="node" type="uflow:nodeType" maxOccurs="unbounded"/>
+					<element name="link" type="uflow:linkType" maxOccurs="unbounded"/>
+					<element name="sink" minOccurs="1">
+						<complexType>
+							<complexContent>
+								<extension base="uflow:sinkType"/>
+							</complexContent>
+						</complexType>
+					</element>
+				</sequence>
+				<attribute name="name" type="NCName" use="optional"/>
+				<attribute name="default" type="xsd:boolean" use="optional"/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="sourceType">
+		<complexContent>
+			<extension base="uflow:documentationType">
+				<sequence>
+					<element name="input" type="uflow:inputType" minOccurs="0"/>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="inputType">
+		<complexContent>
+			<extension base="uflow:documentationType">
+				<attribute name="name" type="string" use="required"/>
+				<attribute name="type" type="QName" use="required"/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="nodeType">
+		<complexContent>
+			<extension base="uflow:documentationType">
+				<sequence>
+					<element name="message" type="uflow:messageType" minOccurs="0" maxOccurs="unbounded"/>
+					<element name="variable" type="uflow:variableType" minOccurs="0" maxOccurs="unbounded"/>
+					<element name="synchronize" minOccurs="0"/>
+					<element name="condition" type="uflow:conditionType"/>
+					<choice>
+						<element name="invoke" minOccurs="0" maxOccurs="unbounded">
+							<complexType>
+								<complexContent>
+									<extension base="uflow:invokeType"/>
+								</complexContent>
+							</complexType>
+						</element>
+						<element name="wait" type="uflow:waitType" minOccurs="0" maxOccurs="unbounded"/>
+					</choice>
+				</sequence>
+				<attribute name="name" type="NCName" use="required"/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="copyType">
+		<sequence>
+			<element name="from" type="uflow:fromType"/>
+			<element name="to" type="uflow:toType"/>
+		</sequence>
+	</complexType>
+	<complexType name="toType">
+		<attribute name="variable" type="QName" use="required"/>
+		<attribute name="part" type="NCName" use="optional"/>
+	</complexType>
+	<complexType name="invokeType">
+		<attribute name="serviceProvider" type="QName" use="required"/>
+		<attribute name="portType" type="NCName" use="required"/>
+		<attribute name="operation" type="NCName" use="required"/>
+		<attribute name="input" type="string" use="optional"/>
+		<attribute name="output" type="string" use="optional"/>
+		<attribute name="subflow" type="boolean" use="optional"/>
+	</complexType>
+	<complexType name="waitType">
+		<attribute name="serviceProvider" type="QName" use="required"/>
+		<attribute name="portType" type="NCName" use="required"/>
+		<attribute name="operation" type="NCName" use="required"/>
+		<attribute name="output" type="QName" use="optional"/>
+	</complexType>
+	<complexType name="linkType">
+		<complexContent>
+			<extension base="uflow:documentationType">
+				<sequence>
+					<element name="copy" type="uflow:copyType" minOccurs="0" maxOccurs="unbounded"/>
+				</sequence>
+				<attribute name="from" type="anyURI" use="required"/>
+				<attribute name="to" type="anyURI" use="required"/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="sinkType">
+		<complexContent>
+			<extension base="uflow:documentationType">
+				<sequence>
+					<element name="output" minOccurs="0">
+						<complexType>
+							<complexContent>
+								<extension base="uflow:outputType"/>
+							</complexContent>
+						</complexType>
+					</element>
+					<element name="synchronize"/>
+				</sequence>
+				<attribute name="name" type="NCName"/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="outputType">
+		<complexContent>
+			<extension base="uflow:documentationType">
+				<attribute name="name" type="string" use="required"/>
+				<attribute name="type" type="QName" use="required"/>
+			</extension>
+		</complexContent>
+	</complexType>
+</schema>

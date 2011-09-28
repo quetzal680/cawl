@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Putdown - 물건 내려놓는 액션-->
+<!--Handside : Left / Right-->
+<!--Height : 물건의 높이 단위는 mm-->
+<Putdown xsi:noNamespaceSchemaLocation="Putdown.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<Handside>Right</Handside>
+	<Height>500</Height>
+</Putdown>

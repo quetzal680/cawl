@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uflow:CAWL name="MTRoomService" version="1.0.1" targetNamespace="RobotServiceTest" 
+	xmlns:uflow="http://www.uflow.org/CAWL1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="/root/Dropbox/workspace/uwdl/1_uWDL2_0_pre_a/CAWL_v1.0.xsd">
+	<uflow:documentation>
+		1. title:  Meeting Room Services using LEGO Robots
+		2. Scenario_Developer: Jongsun Choi
+		3. Impl_Developer: Jaehoon Jeong
+		4. Modification_Date: 2010.04
+	</uflow:documentation>
+	<uflow:baseOntologies>
+		<uflow:ontology namespace="http://ss.ssu.ac.kr/Ontology" location="http://ss.ssu.ac.kr/Ontology/CAWL"/>
+	</uflow:baseOntologies>
+
+	<uflow:serviceProvider type="Company" name="ssCom">
+		<uflow:locator type="static"/>
+	</uflow:serviceProvider>
+	
+	<uflow:message name="MTRoomService_In">
+		<uflow:documentation> 
+			1. Definition of messages: 알리미 서비스에 사용될 변수들의 묶음
+			2. ComplexType으로 초기화함
+		</uflow:documentation>
+		<uflow:part type="Person" name="personName">
+			<uflow:documentation>조도 서비스를 제공 받는 사람</uflow:documentation>
+		</uflow:part>
+		<uflow:part type="URC" name="robotName"/>
+		<uflow:part type="militaryTime" name="currentTime"/>
+		<uflow:part type="militaryTime" name="reservedTime"/>			
+	</uflow:message>
+
+	<uflow:message name="checkRoom">
+		<uflow:part type="officeRoom" name="officeroomNum"/>
+		<uflow:part type="meetingRoom" name="meetingroomNum"/>
+	</uflow:message>
+	
+	<uflow:message name="checkRobotService">
+		<uflow:part type="Check" name="checkFlow"/>
+	</uflow:message>
+	 
+	<uflow:message name="checkDistance">
+		<uflow:part type="Distance" name="R2U-Distance"/>
+	</uflow:message> 
+	 
+	<uflow:variable type="MTRoomService_In" name="inVarUser">
+		<uflow:documentation>
+				1. Definition of variables: 알리미 서비스에 사용될 전역 변수
+				2. 센서로부터 전송 받은 사람의 프로파일 정보를 static 하게 초기화 함
+				3. inVarJohn는 personName으로부터 전달받은 내용을 저장하기 위한 변수
+				4. "John"이라는 사용자 정보는 프로파일 서버를 통해 전달받아야 하는 내용, 현재는 static하게 초기화함
+			</uflow:documentation>
+		<uflow:initialize part="personName">
+			<uflow:from expression="John"/>
+		</uflow:initialize>
+	</uflow:variable>
+	<uflow:variable type="militaryTime" name="crtTime">
+		<uflow:documentation> 현재시간은 시스템으로부터 제공받음, 00:00시로 초기화함 </uflow:documentation>
+		<uflow:initialize part="currentTime">
+			<uflow:from expression="00:00"/>
+		</uflow:initialize> 
+	</uflow:variable>
+	<uflow:variable type="URC" name="robot307"/>	
+	<uflow:variable type="URC" name="robot313"/>					
+	<uflow:variable type="returnValue" name="result">
+		<uflow:documentation>subworkflow의 실행 후 결과 값 </uflow:documentation>
+	</uflow:variable>						
+	<uflow:variable type="robotService" name="serviceCheck">
+		<uflow:documentation>워크플로우의 출력값을 위한 변수,  sink에서 사용, 1(ok)</uflow:documentation>
+		<uflow:initialize part="checkFlow">
+			<uflow:from expression="1"/>
+		</uflow:initialize>
+	</uflow:variable>
+	
+
+	<uflow:activator name="MTRoomServiceActivator">
+		<uflow:condition expression="const1">
+			<uflow:context>
+				<uflow:rule contribute="positive">
+					<uflow:constraint name="const1">
+						<uflow:subject type="militaryTime">?=crtTime/currentTime</uflow:subject>
+						<uflow:verb>is</uflow:verb>
+						<uflow:object type="militaryTime">?rsvTime</uflow:object>
+					</uflow:constraint>
+				</uflow:rule>
+			</uflow:context>
+		</uflow:condition>
+		<uflow:activate flow="MTRoomServiceFlow"/>
+	</uflow:activator>
+	
+	
+	<uflow:flow name="MTRoomServices">
+		<uflow:source>
+			<uflow:documentation>
+				1. 워크플로우의 입력값을 정의한다.
+				2. 첫번째 노드의 전이조건으로 사용할 예약시간 정보를 정으한다.
+			</uflow:documentation>
+			<uflow:input type="militaryTime" name="?rsvTime"/>
+		</uflow:source>
+
+		<uflow:node name="TeaPreparation">
+			<uflow:documentation> 
+				1. 차(tea)를 준비하는 로봇 서비스를 호출하는 노드
+				2. 전이조건: 로봇307이 307호에 있고, 현재 시간이 예약된 시간(13:40분)이다	 
+			 </uflow:documentation>
+			<uflow:variable type="militaryTime" name="rsvTime">
+				<uflow:documentation> 
+					1. 시스템은 예약시간(rsvTime)을 이전 워크플로우로부터 전달 받은 값 또는 개발자가 정한 값으로 초기화 한다.
+					2. 본 시나리오에서는 개발자가 정한 값(13:40시)으로 초기화한다. </uflow:documentation>
+				<uflow:initialize part="reservedTime"><uflow:from expression="13:40"/></uflow:initialize> 
+			</uflow:variable>
+			<uflow:condition expression="C1 and C2">
+				<uflow:context>
+					<uflow:rule contribute="positive">
+						<uflow:constraint name="C1">
+							<uflow:subject type="URC">?=Robot307/robotName</uflow:subject>
+							<uflow:verb>isLocated</uflow:verb>
+							<uflow:object type="officeRoom">?=roomNum/officeroomNum</uflow:object>
+						</uflow:constraint>
+						<uflow:constraint name="C2">
+							<uflow:subject type="militaryTime">?=crtTime/currentTime</uflow:subject>
+							<uflow:verb>is</uflow:verb>
+							<uflow:object type="militaryTime">?=rsvTime</uflow:object>
+						</uflow:constraint>
+					</uflow:rule>
+				</uflow:context>
+			</uflow:condition>
+			<uflow:invoke serviceProvider="ssCom" portType="TeaPreparationPT" operation="TeaRobotService" input="?rsvTime" output="?result" subflow="true"/>
+		</uflow:node>
+
+		<uflow:node name="DisplayLightInfo">
+			<uflow:documentation>회의실의 조도 정보를 알려주는 서비스를 호출하는 노드</uflow:documentation>
+			<uflow:variable name="roomNum" type="officeRoom">
+				<uflow:documentation> 방번호는 다른 서버로부터 제공받아야 하는 정보로, 본 문서에서는  static 정보로 초기화함 </uflow:documentation>
+				<uflow:initialize part="officeroomNum"><uflow:from expression="313"/></uflow:initialize>
+			</uflow:variable>
+			<uflow:variable type="militaryTime" name="rsvTime">
+				<uflow:documentation> 
+					1. 시스템은 예약시간(rsvTime)을 이전 워크플로우로부터 전달 받은 값 또는 개발자가 정한 값으로 초기화 한다.
+					2. 본 시나리오에서는 개발자가 정한 값(13:50시)으로 초기화한다. </uflow:documentation>
+				<uflow:initialize part="reservedTime"><uflow:from expression="13:50"/></uflow:initialize> 
+			</uflow:variable>	
+			<uflow:condition expression="C1 and C2 and C3">
+				<uflow:context>
+					<uflow:rule contribute="positive">
+						<uflow:documentation>
+							1. positive는 우선순위, default값이 positive
+							2. C1: 현재 사용자가 해당 사무실(313호)에 있다.
+							3. C2: robot313이 해당 사무실(313호)에 있다.
+							3. C3: 현재 시간이 서비스를 제공하기로 예약된 시간(13:50)이다. 
+						</uflow:documentation>
+						<uflow:constraint name="C1">
+							<uflow:subject type="Person">?=inVarUser/personName</uflow:subject>
+							<uflow:verb>is</uflow:verb>
+							<uflow:object type="officeRoom">?=roomNum/officeroomNum</uflow:object>
+						</uflow:constraint>
+						<uflow:constraint name="C2">
+							<uflow:subject type="URC">?=Robot313/robotName</uflow:subject>
+							<uflow:verb>isLocated</uflow:verb>
+							<uflow:object type="officeRoom">?=roomNum/officeroomNum</uflow:object>
+						</uflow:constraint>
+						<uflow:constraint name="C3">
+							<uflow:subject type="militaryTime">?=crtTime/currentTime</uflow:subject>
+							<uflow:verb>is</uflow:verb>
+							<uflow:object type="militaryTime">?=rsvTime</uflow:object>
+						</uflow:constraint>
+					</uflow:rule>
+				</uflow:context>
+			</uflow:condition>
+			<uflow:invoke serviceProvider="ssCom" portType="DisplayLightInfoPT" operation="DisplayLightInfo" input="?rsvTime" output="?result" subflow="true" />
+		</uflow:node>
+		
+		<uflow:link to="TeaPreparation" from="source"/>
+		<uflow:link to="DisplayLightInfo" from="TeaPreparation"/>
+		<uflow:link to="sink" from="DisplayLightInfo"/>
+				
+		<uflow:sink>
+			<uflow:output name="?serviceCheck" type="robotService" />
+			<uflow:synchronize/>
+		</uflow:sink>
+	</uflow:flow>
+	
+		
+	<uflow:flow name="TeaRobotService"> <uflow:documentation> 차를 준비해주는 로봇을 이용한 서비스 </uflow:documentation>
+		<uflow:variable type="militaryTime" name="rsvTime4Tea">
+			<uflow:documentation>TeaRobotService에서 사용할 변수 선언 및 초기화</uflow:documentation>
+			<uflow:initialize part="reservedTime"><uflow:from expression="00:00"/></uflow:initialize> 
+		</uflow:variable>
+		
+		<uflow:source>
+			<uflow:documentation>TeaPreparation 노드에서 호출할때의 예약시간(13:40)을 받음</uflow:documentation>
+			<uflow:input type="militaryTime" name="?rsvTime4Tea"/>
+		</uflow:source>
+				
+		<uflow:node name="MoveDown">
+			<uflow:condition expression="C1">
+				<uflow:context>
+					<uflow:rule contribute="positive">
+							<uflow:constraint name="C1">
+							<uflow:subject type="militaryTime">?crtTime/currentTime</uflow:subject>
+							<uflow:verb>is</uflow:verb>
+							<uflow:object type="militaryTime">?rsvTime4Tea</uflow:object>
+						</uflow:constraint>
+					</uflow:rule>
+				</uflow:context>
+			</uflow:condition>
+			<uflow:invoke operation="GenerationOfarmMVdown" portType="MoveDownPT" serviceProvider="ssCom" input="armMVdown:tartgetLoc" output="LEGO_CMD"/>
+		</uflow:node>
+					
+		<uflow:node name="MoveUp">
+			 <uflow:variable type="militaryTime" name="rsvTime4MVup">
+				 <uflow:initialize part="reservedTime">
+						<uflow:from expression="13:42"/>
+					</uflow:initialize>
+			 </uflow:variable>
+			<uflow:condition expression="C1">
+				<uflow:context>
+					<uflow:rule contribute="positive">
+							<uflow:constraint name="C1">
+							<uflow:subject type="militaryTime">?crtTime/currentTime</uflow:subject>
+							<uflow:verb>is</uflow:verb>
+							<uflow:object type="militaryTime">?rsvTime4MVup</uflow:object>
+						</uflow:constraint>
+					</uflow:rule>
+				</uflow:context>
+			</uflow:condition>
+			<uflow:invoke operation="GenerationOfarmMVdown" portType="MoveDownPT" serviceProvider="ssCom" input="armMVup:tartgetLoc" output="LEGO_CMD"/>
+		</uflow:node>
+			
+		<uflow:link to="MoveDown" from="source"></uflow:link>
+		<uflow:link to="MoveUp" from="MoveDown"></uflow:link>
+		
+		<uflow:sink>
+			<uflow:output name="?serviceCheck" type="robotService" />
+			<uflow:synchronize/>
+		</uflow:sink>
+	</uflow:flow>
+
+
+	<uflow:flow name="DisplayLightInfo">
+		<uflow:documentation> LEGO Robot1으로부터 받은 미팅룸의 발기 정보를 알려주는  서비스 </uflow:documentation>
+		<uflow:variable type="officeRoom" name="roomNum">
+			<uflow:initialize part="officeroomNum">
+				<uflow:from expression="313"/>
+			</uflow:initialize>
+		</uflow:variable>
+		<uflow:variable type="militaryTime" name="rsvTime4LightInfo">
+			<uflow:initialize part="reservedTime">
+				<uflow:from expression="00:00"/>
+			</uflow:initialize>
+		</uflow:variable>
+		
+		<uflow:source>
+			<uflow:documentation>DisplayLightInfo 노드에서 호출할때의 예약시간(13:50)을 받음</uflow:documentation>
+			<uflow:input type="militaryTime" name="?=rsvTime4LightInfo/reservedTime"/>
+		</uflow:source>
+		
+		<uflow:node name="MOVE">
+			<uflow:documentation>
+				1. 조건: 사용자가 사무실(313호)에 있고, 서비스를 제공받아야 하는 시간(13:50)이다.
+				2. 호출: 사용자의 위치로 이동하라는 명령어를 생성하는 웹 서비스를 호출함
+				3. 입력정보: legMV:userLoc, {m(move)-명령어모드, userLoc-사용자의 위치(사용자의 좌표 정보)}
+				4. 출력정보: LEGO_CMD, 명령어를 생성하는 웹 서비스로부터 제공받은 로봇 제어 명령어	
+			</uflow:documentation>
+			<uflow:condition expression="C1 and C2">
+				<uflow:context>
+					<uflow:rule contribute="positive">
+						<uflow:constraint name="C1">
+							<uflow:subject type="militaryTime">currentTime</uflow:subject>
+							<uflow:verb>is</uflow:verb>
+							<uflow:object type="militaryTime">?rsvTime4LightInfo</uflow:object>
+						</uflow:constraint>
+						<uflow:constraint name="C2">
+							<uflow:subject type="Person">?=inVarUser/personName</uflow:subject>
+							<uflow:verb>is</uflow:verb>
+							<uflow:object type="officeRoom">?roomNum</uflow:object>
+						</uflow:constraint>
+					</uflow:rule>
+				</uflow:context>
+			</uflow:condition>
+			<uflow:invoke operation="GenerationOfMOVE" portType="MOVE" serviceProvider="ssCom" input="legMV:userLoc" output="LEGO_CMD"/>
+		</uflow:node>
+		
+		<uflow:node name="STOP-LightInfo">
+			 <uflow:documentation>거리센서로 측정한 거리가 50cm 보다 작으면 멈춤</uflow:documentation>
+			<uflow:variable type="distance" name="effectiveDistance">
+				<uflow:initialize part="R2U-Distance">
+					<uflow:from expression="50"/>
+				</uflow:initialize>
+			</uflow:variable>
+			<uflow:condition expression="C1">
+			 <uflow:context>
+					<uflow:rule contribute="positive">
+						<uflow:constraint name="C1">
+							<uflow:subject>?=robot2userDistance/R2U-Distance</uflow:subject>
+							<uflow:verb>lt</uflow:verb>
+							<uflow:object>?effectiveDistance</uflow:object>
+						</uflow:constraint>
+					</uflow:rule>
+				</uflow:context>
+			</uflow:condition>
+			<uflow:invoke operation="GenerationOfSTOP" portType="STOP" serviceProvider="ssCom" input="legST:stop" output="LEGO_CMD"/>
+			<uflow:invoke operation="GenerationOfDisplayLightInfo" portType="DisplayLightInfo" serviceProvider="ssCom" input="disp:lightInfo" output="LEGO_CMD"/>
+		</uflow:node>
+		
+		<uflow:link to="MOVE" from="source"/>
+		<uflow:link to="STOP-LightInfo" from="MOVE"/>
+		<uflow:link to="sink" from="STOP-LightInfo"/>
+		
+		<uflow:sink>
+			<uflow:output name="?serviceCheck" type="robotService" />
+			<uflow:synchronize/>
+		</uflow:sink>
+
+	</uflow:flow>
+
+</uflow:CAWL>

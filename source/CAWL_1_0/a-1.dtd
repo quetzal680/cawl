@@ -1,0 +1,97 @@
+<!-- ATTRLIST 의 각 열거형 타입에 기본(default) 값을 정의 예) ATTLIST Case
+	  type	(default | final) "default" --> 
+
+<!ELEMENT uWdl (Source, Node*, Link*, Sink*)>
+<!ATTLIST Uwdl
+	version	CDATA	#FIXED	'0.1'
+	log	CDATA	#IMPLIED
+>
+
+<!ELEMENT Source EMPTY>
+
+<!ELEMENT Node (Description?, (Uflow | Services))>
+<!ATTLIST Node
+	name	CDATA	#REQUIRED
+	log	CDATA	#IMPLIED
+>
+
+<!ELEMENT Description (#PCDATA)>
+
+<!ELEMENT Uflow	(Location)>
+
+<!ELEMENT Location (#PCDATA)>
+
+<!ELEMENT Services (Wsdl, Porttype, Operation)>
+
+<!ELEMENT Wsdl (#PCDATA)>
+
+<!ELEMENT Porttype (#PCDATA)>
+
+<!ELEMENT Operation (#PCDATA)>
+
+<!ELEMENT Link (Case+)>
+<!ATTLIST Link
+	  nodeName	CDATA	#REQUIRED
+>
+
+<!ELEMENT Case (Condition, Action)>
+<!ATTLIST Case
+	  type	(default | final)	"default"	#REQUIRED
+>
+
+<!ELEMENT Condition (Context | Profile | Event | Correlation | Result)>
+
+<!ELEMENT Context (Rule+)>
+
+<!ELEMENT Rule (Constraint+)>
+<!ATTLIST Rule
+	priority	CDATA	#REQUIRED
+>
+
+<!ELEMENT Constraint EMPTY>
+<!ATTLIST Constraint
+	type	(AND | OR)	"AND"	#IMPLIED
+	subject	CDATA	#REQUIRED
+	verb	CDATA	#REQUIRED
+	object	CDATA	#REQUIRED
+>
+
+<!ELEMENT Profile (Customization+)>
+
+<!ELEMENT Customization EMPTY>
+<!ATTLIST Customization
+        type	(AND | OR)	"AND"	#IMPLIED
+	subject	CDATA	#REQUIRED
+	verb	CDATA	#REQUIRED
+	object	CDATA	#REQUIRED
+>
+
+<!ELEMENT Event	(Property+)>
+<!ATTLIST Event
+	type	(true | false)	"true"	#IMPLIED
+>
+
+<!ELEMENT Property (#PCDATA)>
+
+<!ELEMENT Correlation (Join+)>
+
+<!ELEMENT Join (Target, State)>
+
+<!ELEMENT Target (#PCDATA)>
+
+<!ELEMENT State (#PCDATA)>
+
+<!ELEMENT Result ANY>
+
+<!ELEMENT Action (Export | Transition)>
+
+<!ELEMENT Export (Port)>
+<!ATTLIST Export
+	type	CDATA	#REQUIRED
+>
+
+<!ELEMENT Port (#PCDATA)>
+
+<!ELEMENT Transition (#PCDATA)>
+
+<!ELEMENT Sink (#PCDATA)>

@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uwdl name="MTRoomService" version="1.0.1" targetNamespace="RobotServiceTest">
+	<documentation>Meeting Room Services using LEGO Robots</documentation>
+	<baseOntologies>
+		<ontology namespace="http://ss.ssu.ac.kr/Ontology" location="http://ss.ssu.ac.kr/Ontology/CAWL"/>
+	</baseOntologies>
+
+	<serviceProvider name="ssCom" type="Company" >
+		<locator type="static"/>
+	</serviceProvider>
+	
+	<message name="msg4MTRoomService">
+		<part name="personName" type="Person"/>
+		<part name="robot1" type="Robot"/>
+		<part name="robot2" type="Robot"/>
+		<part name="server1" type="PC"/>
+		<part name="server2" type="PC"/>
+		<part name="meetingRoomNum" type="Room"/>
+		<part name="officeRoomNum" type="Room"/>	
+	</message>
+	
+	<message name="msg4TimeInfo">
+		<part name="crtTime" type="militaryTime"/>
+		<part name="rsvTime" type="militaryTime"/>
+	</message>
+<!--
+	<message name="msg4CheckSystem">
+		<part name="downloadServer" type="PC"/>
+		<part name="available" type="Check"/>
+		<part name="unavailable" type="Check"/>
+	</message>
+-->
+	<message name="msg4RequestRobotCMD">
+		<part name="robotType" type="R-Type"/>
+		<part name="robotMode" type="Mode"/>
+		<part name="robotCommand" type="Command"/>
+		<part name="robotArgument" type="Argument"/>
+	</message>
+	
+	<message name="msg4Distance">
+		<part name="R2U-Distance" type="Distance"/>
+		<part name="effective-Distance" type="Distance"/>
+	</message>	
+	
+	<variable name="var4MTRoomService" type="msg4MTRoomService">
+		<initialize part="personName"><from expression="John"/></initialize>
+		<initialize part="robot1"><from expression="R-307"/></initialize> 
+		<initialize part="robot2"><from expression="R-313"/></initialize> 
+		<initialize part="server1"><from expression="PC-307"/></initialize> 
+		<initialize part="server2"><from expression="PC-313"/></initialize> 
+		<initialize part="meetingRoomNum"><from expression="307"/></initialize> 
+		<initialize part="officeRoomNum"><from expression="313"/></initialize> 
+	</variable>	
+<!--	
+	<variable name="var4CheckSystem" type="msg4CheckSystem">
+		<initialize part="downloadServer"><from expression="PC-307"/></initialize>
+		<initialize part="available"><from expression="TRUE"/></initialize>
+		<initialize part="unavailable"><from expression="FALSE"/></initialize>
+	</variable>
+-->			
+	<activator name="MTRoomServiceActivator">
+		<variable name="var4TimeInfo" type="msg4TimeInfo">
+			<initialize part="crtTime"><from expression="1340"/></initialize>
+			<initialize part="rsvTime"><from expression="1340"/></initialize> 
+		</variable>
+			
+		<condition expression="C1 and C2">
+			<context>
+				<rule contribute="positive">
+					<constraint name="C1">
+						<subject type="militaryTime">?=var4TimeInfo/crtTime</subject>
+						<verb>is</verb>
+						<object type="militaryTime">?=var4TimeInfo/rsvTime</object>
+					</constraint>
+					<constraint name="C2">
+						<subject type="Person">?=var4MTRoomService/personName</subject>
+						<verb>isLocated</verb>
+						<object type="Room">?=var4MTRoomService/officeRoomNum</object>
+					</constraint>
+				</rule>
+			</context>
+		</condition>
+		<activate flow="MTRoomServiceFlow"/>
+	</activator>
+	
+	<flow name="MTRoomServiceFlow">
+		<source>
+			<input name="var4MTRoomService" type="msg4MTRoomService"/>
+		</source>
+
+		<node name="MusicTeaPreparation">
+			<variable name="var4TimeInfo" type="msg4TimeInfo">
+				<initialize part="crtTime"><from expression="1340"/></initialize>
+				<initialize part="rsvTime"><from expression="1340"/></initialize> 
+			</variable>
+			
+			<condition expression="C1 and C2">
+				<context>
+					<rule contribute="positive">
+						<constraint name="C1">
+							<subject type="militaryTime">?var4TimeInfo/rsvTime</subject>
+							<verb>is</verb>
+							<object type="militaryTime">?var4TimeInfo/crtTime</object>
+						</constraint>
+						<constraint name="C2">
+							<subject type="Robot">?var4MTRoomService/robot1</subject>
+							<verb>isLocated</verb>
+							<object type="Room">?=var4MTRoomService/meetingRoomNum</object>
+						</constraint>
+					</rule>
+				</context>
+			</condition>
+			
+			<invoke serviceProvider="uwdl" portType="MusicTeaPreparationPT" operation="MusicTeaRobotServiceFlow" subflow="true"/>
+			<!-- 현재 serviceProvider가 uwdl인경우에만 subflow로 인식함, 향후 subflow="true" 부분을 체크하는 것으로 수정해야함 -->
+		</node>
+
+		<node name="DisplayLightInfo">
+			<variable name="var4TimeInfo" type="msg4TimeInfo">
+				<initialize part="crtTime"><from expression="1350"/></initialize>
+				<initialize part="rsvTime"><from expression="1350"/></initialize> 
+			</variable>
+						
+			<condition expression="C1 and C2 and C3">
+				<context>
+					<rule contribute="positive">
+						<constraint name="C1">
+							<subject type="militaryTime">?var4TimeInfo/rsvTime</subject>
+							<verb>is</verb>
+							<object type="militaryTime">?var4TimeInfo/crtTime</object>
+						</constraint>						
+						<constraint name="C2">
+							<subject type="Person">?=var4MTRoomService/personName</subject>
+							<verb>isLocated</verb>
+							<object type="Room">?=var4MTRoomService/officeRoomNum</object>
+						</constraint>
+						<constraint name="C3">
+							<subject type="Robot">?=var4MTRoomService/robot2</subject>
+							<verb>isLocated</verb>
+							<object type="Room">?=var4MTRoomService/officeRoomNum</object>
+						</constraint>
+						
+					</rule>
+				</context>
+			</condition>
+			<invoke serviceProvider="uwdl" portType="DisplayLightInfoPT" operation="LightInfoFlow" subflow="true" />
+		</node>
+		
+		<!--
+		<node name="CheckSystem">
+			<variable name="var4TimeInfo" type="msg4TimeInfo">
+				<initialize part="crtTime"><from expression="1351"/></initialize>
+				<initialize part="rsvTime"><from expression="1351"/></initialize> 
+			</variable>
+						
+			<condition expression="C1 and C2">
+				<context>
+					<rule contribute="positive">
+						<constraint name="C1">
+							<subject type="militaryTime">?var4TimeInfo/rsvTime</subject>
+							<verb>is</verb>
+							<object type="militaryTime">?var4TimeInfo/crtTime</object>
+						</constraint>						
+						<constraint name="C2">
+							<subject type="PC">?=var4MTRoomService/server1</subject>
+							<verb>isLocated</verb>
+							<object type="Room">?=var4MTRoomService/meetingRoomNum</object>
+						</constraint>
+					</rule>
+				</context>
+			</condition>
+			<invoke serviceProvider="ssCom" portType="CheckSystemPT" operation="CheckSystem" output="?=var4CheckSystem/StateOfSystem"/>
+		</node>
+		-->
+			
+		<node name="DownloadFile">
+			<variable name="var4TimeInfo" type="msg4TimeInfo">
+				<initialize part="crtTime"><from expression="1352"/></initialize>
+				<initialize part="rsvTime"><from expression="1352"/></initialize> 
+			</variable>
+						
+			<condition expression="C1 and C2 and C3">
+				<context>
+					<rule contribute="positive">
+						<constraint name="C1">
+							<subject type="militaryTime">?var4TimeInfo/rsvTime</subject>
+							<verb>is</verb>
+							<object type="militaryTime">?var4TimeInfo/crtTime</object>
+						</constraint>						
+						<constraint name="C2">
+							<subject type="PC">?=var4MTRoomService/server1</subject>
+							<verb>isLocated</verb>
+							<object type="Room">?=var4MTRoomService/meetingRoomNum</object>
+						</constraint>
+<!--
+						<constraint name="C3">
+							<subject type="PC">?=var4CheckSystem/downloadServer</subject>
+							<verb>isAvailable</verb>
+							<object type="Check">?=var4CheckSystem/available</object>
+						</constraint>
+-->
+					</rule>
+				</context>
+			</condition>
+			<invoke serviceProvider="ssCom" portType="DownloadFilePT" operation="DownloadFile"/>
+		</node>
+
+		<link to="MusicTeaPreparation" from="source"/>
+		<link to="DisplayLightInfo" from="MusicTeaPreparation"/>
+<!--
+		<link to="CheckSystem" from="DisplayLightInfo"/>
+		<link to="DownloadFile" from="CheckSystem"/>
+-->
+		<link to="DownloadFile" from="DisplayLightInfo"/>
+		<link to="sink" from="DownloadFile"/>
+				
+		<sink>
+			<output name="var4MTRoomService" type="msg4MTRoomService">
+			</output>
+		</sink>
+	</flow>
+	
+		
+	<flow name="MusicTeaRobotServiceFlow">
+		<variable name="var4TimeInfo" type="msg4TimeInfo">
+				<initialize part="crtTime"><from expression="1340"/></initialize>
+				<initialize part="rsvTime"><from expression="1340"/></initialize> 
+		</variable>
+			
+		<source>
+			<input name="var4TimeInfo" type="militaryTime"/>
+		</source>
+				
+		<node name="MoveDown">
+			<variable name="reqMoveDown" type="msg4RequestRobotCMD">
+				<initialize part="robotType"><from expression="R-307"/></initialize>
+				<initialize part="robotMode"><from expression="Arm"/></initialize> 
+				<initialize part="robotCommand"><from expression="MoveDown"/></initialize>
+				<initialize part="robotArgument"><from expression="3D-TargetLoc"/></initialize> 
+			</variable>
+			
+			<condition expression="C1">
+				<context>
+					<rule contribute="positive">
+						<constraint name="C1">
+							<subject type="militaryTime">?var4TimeInfo/rsvTime</subject>
+							<verb>is</verb>
+							<object type="militaryTime">?var4TimeInfo/crtTime</object>
+						</constraint>
+					</rule>
+				</context>
+			</condition>
+			<invoke serviceProvider="ssCom" portType="ArmMoveDownPT" operation="moveLegoService"  input="?reqMoveDown"/>
+		</node>
+					
+		<node name="MoveUpMusic">
+			<variable name="var4TimeInfo" type="msg4TimeInfo">
+				<initialize part="crtTime"><from expression="1342"/></initialize>
+				<initialize part="rsvTime"><from expression="1342"/></initialize> 
+			</variable>
+			
+			<variable name="reqMoveUp" type="msg4RequestRobotCMD">
+				<initialize part="robotType"><from expression="R-307"/></initialize>
+				<initialize part="robotMode"><from expression="Arm"/></initialize> 
+				<initialize part="robotCommand"><from expression="MoveUp"/></initialize>
+				<initialize part="robotArgument"><from expression="3D-TargetLoc"/></initialize> 
+			</variable>
+			
+			<variable name="reqPlayMusic" type="msg4RequestRobotCMD">
+				<initialize part="robotType"><from expression="R-307"/></initialize>
+				<initialize part="robotMode"><from expression="Sound"/></initialize> 
+				<initialize part="robotCommand"><from expression="PlayWaveFile"/></initialize>
+				<initialize part="robotArgument"><from expression="Filename"/></initialize> 
+			</variable>
+			
+			<condition expression="C1">
+				<context>
+					<rule contribute="positive">
+						<constraint name="C1">
+							<subject type="militaryTime">?var4TimeInfo/rsvTime</subject>
+							<verb>is</verb>
+							<object type="militaryTime">?var4TimeInfo/crtTime</object>
+						</constraint>
+					</rule>
+				</context>
+			</condition>
+			<invoke serviceProvider="ssCom" portType="ArmMoveUpPT" operation="moveLegoService" input="?reqMoveUp"/>
+			<invoke serviceProvider="ssCom" portType="MusicPreparationPT" operation="musicLegoService" input="?reqPlayMusic"/>
+		</node>
+			
+		<link to="MoveDown" from="source"/>
+		<link to="MoveUpMusic" from="MoveDown"/>
+		<link to="slink" from="MoveUpMusic"/>
+
+		<sink>
+			<output name="var4TimeInfo" type="militaryTime">
+			</output>
+		</sink>
+	</flow>
+
+
+	<flow name="LightInfoFlow">
+		<variable name="var4TimeInfo" type="msg4TimeInfo">
+			<initialize part="crtTime"><from expression="1350"/></initialize>
+			<initialize part="rsvTime"><from expression="1350"/></initialize> 
+		</variable>
+			
+		<source>
+			<input name="var4TimeInfo" type="militaryTime"/>
+		</source>
+				
+		<node name="Move">
+			<variable name="reqLegMove" type="msg4RequestRobotCMD">
+				<initialize part="robotType"><from expression="R-313"/></initialize>
+				<initialize part="robotMode"><from expression="Leg"/></initialize> 
+				<initialize part="robotCommand"><from expression="Move"/></initialize>
+				<initialize part="robotArgument"><from expression="2D-TargetLoc"/></initialize> 
+			</variable>
+						
+			<condition expression="C1 and C2">
+				<context>
+					<rule contribute="positive">
+						<constraint name="C1">
+							<subject type="militaryTime">?=var4TimeInfo/rsvTime</subject>
+							<verb>is</verb>
+							<object type="militaryTime">?=var4TimeInfo/crtTime</object>
+						</constraint>
+						<constraint name="C2">
+							<subject type="Person">?=var4MTRoomService/personName</subject>
+							<verb>isLocated</verb>
+							<object type="Room">?=var4MTRoomService/officeRoomNum</object>
+						</constraint>
+					</rule>
+				</context>
+			</condition>
+			<invoke serviceProvider="ssCom" portType="LegMovePT" operation="moveLegoService" input="?reqLegMove"/>
+		</node>
+		
+		<node name="STOPLightInfo">
+			<variable name="Distance" type="msg4Distance" >
+				<initialize part="R2U-Distance"><from expression="NULL"/></initialize>
+				<initialize part="effective-Distance"><from expression="50"/></initialize>
+			</variable>
+			
+			<variable name="reqLegStop" type="msg4RequestRobotCMD">
+				<initialize part="robotType"><from expression="R-313"/></initialize>
+				<initialize part="robotMode"><from expression="Leg"/></initialize> 
+				<initialize part="robotCommand"><from expression="Stop"/></initialize>
+				<initialize part="robotArgument"><from expression="None"/></initialize> 
+			</variable>
+						
+			<variable name="reqDisplay" type="msg4RequestRobotCMD">
+				<initialize part="robotType"><from expression="R-313"/></initialize>
+				<initialize part="robotMode"><from expression="LCD"/></initialize> 
+				<initialize part="robotCommand"><from expression="Display"/></initialize>
+				<initialize part="robotArgument"><from expression="OutputInfo"/></initialize> 
+			</variable>
+						
+			<condition expression="C1">
+				 <context>
+					<rule contribute="positive">
+						<constraint name="C1">
+							<subject type="Distance">?=Distance/effective-Distance</subject>
+							<verb>lt</verb>
+							<object type="Distance">?=Distance/R2U-Distance</object>
+						</constraint>
+					</rule>
+				</context>
+			</condition>
+			<invoke serviceProvider="ssCom" portType="STOP" operation="moveLegoService" input="?reqLegStop"/>
+			<invoke serviceProvider="ssCom" portType="GetLightInfo" operation="getLightInfo" input="?=var4MTRoomService/meetingRoomNum" />
+			<invoke serviceProvider="ssCom" portType="DisplayLightInfo" operation="displayLegoService" input="?reqDisplay"/>
+		</node>
+		
+		<link to="Move" from="source"/>
+		<link to="STOPLightInfo" from="Move"/>
+		<link to="sink" from="STOPLightInfo"/>
+		
+		<sink>
+			<output name="var4TimeInfo" type="militaryTime">
+			</output>
+		</sink>
+	</flow>
+
+</uwdl>
+
+
+
+
+

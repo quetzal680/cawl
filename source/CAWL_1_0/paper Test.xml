@@ -1,0 +1,587 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uWDL name="OfficeManageSC" version="2.0.1" targetNamespace="test">
+	<documentation>test	</documentation>
+	<baseOntologies>
+		<ontology namespace="http://ss.ssu.ac.kr/Ontology" location="http://ss.ssu.ac.kr/Ontology/uWDL"/>
+	</baseOntologies>
+	<serviceProvider name="Company" type="companyServiceType">
+		<locator type="static"/>
+	</serviceProvider>
+	
+	<message name="officeSchedule_in">
+		<part name="personName" type="personNameType"/>
+		<part name="deskId" type="deskIdType"/>
+		<part name="pcId" type="pcIdType"/>
+		<part name="pdaId" type="pdaIdType"/>
+	</message>
+	<message name="schedDisplayOn">
+		<part name="pcId" type="pcIdType"/>
+		<part name="schedDisplayReq" type="schedDisplaySateType"/>
+	</message>
+	<message name="checkRoom">
+		<part name="roomNum" type="roomType"/>
+		<part name="reservedRoomTime" type="reservedRoomTimeType"/>
+	</message>
+	<message name="alarmming">
+		<part name="alarmPerson1" type="personNameType"/>
+		<part name="alarmPerson2" type="personNameType"/>
+		<part name="alarmPerson3" type="personNameType"/>
+	</message>
+	<message name="showFile">
+		<part name="roomNum" type="roomType"/>
+		<part name="fileId" type="fileIdType"/>
+		<part name="pcId" type="pcIdType"/>
+	</message>
+	<message name="LightCfg">
+		<part name="roomNum" type="roomType"/>
+		<part name="lightState" type="lightStateType"/>
+	</message>
+	
+	<message name="downloadFile">
+		<part name="roomNum" type="roomType"/>
+		<part name="pcId" type="pcIdType"/>
+	</message>
+
+	<variable name="inVarJohn" type="officeSchedule_in">
+		<initialize part="personName">
+			<from expression="John"/>
+		</initialize>
+		<initialize part="deskId">
+			<from expression="DESK30203"/>
+		</initialize>
+		<initialize part="pcId">
+			<from expression="PC30203"/>
+		</initialize>
+		<initialize part="pdaId">
+			<from expression="PDA30203"/>
+		</initialize>
+	</variable>
+	
+	<!-- All of Activator Description : Start -->
+	<!-- John Activator : Start -->
+	<activator name="JohnScheduleActivator">
+		<variable name="reservedTime" type="militaryTime">
+			<initialize>
+				<from expression="0900"/>
+			</initialize>
+		</variable>
+		
+		<variable name="roomNum" type="roomType">
+			<initialize>
+				<from expression="302"/>
+			</initialize>
+		</variable>
+		
+		<variable name="Current" type="militaryTime">
+			<initialize>
+				<from expression="0900"/>
+			</initialize>
+		</variable>
+
+		<condition expression="c1 and c2">
+			<context>
+				<rule contribute="positive">
+					<constraint name="c1">
+						<subject type="militaryTime">?Current</subject>
+						<verb>is</verb>
+						<object type="militaryTime">?reservedTime</object>
+					</constraint>
+					<constraint name="c2">
+						<subject type="personNameType">?=inVarJohn/personName</subject>
+						<verb>located</verb>
+						<object type="roomType">?roomNum</object>
+					</constraint>
+				</rule>
+			</context>
+		</condition>
+		<activate flow="JohnScheduleFlow"/>
+	</activator>
+	<!-- John Activator : End -->
+	<!-- All of Activator Description : End -->
+	<!-- John's Workflow : Start -->
+	<flow name="JohnScheduleFlow">
+		<!-- John's Source : Start -->
+		<source>
+			<input name="inVarJohn" type="officeSchedule_in"/>
+		</source>
+		<!-- John's Source : End -->
+		<!-- John's SchedDisplay : Start -->
+		<node name="SchedDisplay">
+			<variable name="schedDisply" type="schedDisplayOn">
+				<initialize part="pcId">
+					<from expression="?=inVarJohn/pcId"/>
+				</initialize>
+				<initialize part="schedDisplayReq">
+					<from expression="1"/>
+				</initialize>
+			</variable>
+			<variable name="reservedTime" type="militaryTime">
+				<initialize>
+					<from expression="0900"/>
+				</initialize>
+			</variable>
+			<variable name="roomNum" type="roomType">
+				<initialize>
+					<from expression="302"/>
+				</initialize>
+			</variable>
+			<variable name="whatDay" type="dateType">
+				<initialize>
+					<from expression="20080830"/>
+				</initialize>
+			</variable>
+			<variable name="Today" type="dateType">
+				<initialize>
+					<from expression="20080830"/>
+				</initialize>
+			</variable>
+			<variable name="Current" type="militaryTime">
+				<initialize>
+					<from expression="0900"/>
+				</initialize>
+			</variable>	
+			
+			<condition expression="c1 and c2 and c3 and c4">
+				<context>
+					<rule contribute="positive">
+						<constraint name="c1">
+							<subject type="dateType">?Today</subject>
+							<verb>is </verb>
+							<object type="dateType">?whatDay</object>
+						</constraint>
+						<constraint name="c2">
+							<subject type="militaryTime">?Current</subject>
+							<verb>is</verb>
+							<object type="militaryTime">?reservedTime</object>
+						</constraint>
+						<constraint name="c3">
+							<subject type="personNameType">?=inVarJohn/personName</subject>
+							<verb>located</verb>
+							<object type="roomType">?roomNum</object>
+						</constraint>
+						<constraint name="c4">
+							<subject type="pdaIdType">?=inVarJohn/pdaId</subject>
+							<verb>was connected</verb>
+							<object type="pcIdType">?=inVarJohn/pcId</object>
+						</constraint>
+					</rule>
+				</context>
+			</condition>
+			<invoke serviceProvider="Company" portType="schedDisplayPT" operation="schedDisplay" input="?schedDisply"/>
+		</node>
+		<!-- John's SchedDisplay : End -->
+		<!-- John's ManagerMeeting : Start -->
+		<node name="ManagerMeeting">
+			<variable name="fileInfo" type="showFile">
+				<initialize part="roomNum">
+					<from expression="501"/>
+				</initialize>
+				<initialize part="fileId">
+					<from expression="501meeting.ppt"/>
+				</initialize>
+				<initialize part="pcId">
+					<from expression="PC50101"/>
+				</initialize>
+			</variable>
+			<variable name="roomNum" type="roomType">
+				<initialize>
+					<from expression="501"/>
+				</initialize>
+			</variable>
+			<variable name="reservedTime" type="militaryTime">
+				<initialize>
+					<from expression="1030"/>
+				</initialize>
+			</variable>
+			<variable name="reservedRoomTime" type="militaryTime">
+				<initialize>
+					<from expression="1100"/>
+				</initialize>
+			</variable>
+			<variable name="Current" type="militaryTime">
+				<initialize>
+					<from expression="1030"/>
+				</initialize>
+			</variable>
+			<variable name="musicState" type="playMusicStateType">
+			</variable>
+			<variable name="mettingMember" type="alarmming">
+				<initialize part="alarmPerson1">
+					<from expression="?=inVarJohn/personName"/>
+				</initialize>
+				<initialize part="alarmPerson2">
+					<from expression="Michele"/>
+				</initialize>
+				<initialize part="alarmPerson3">
+					<from expression="Park"/>
+				</initialize>
+			</variable>
+			
+			<condition expression="c1 and c2 and c3">
+				<context>
+					<rule contribute="positive">
+						<constraint name="c1">
+							<subject type="militaryTime">?Current</subject>
+							<verb>is </verb>
+							<object type="militaryTime">?reservedTime</object>
+						</constraint>
+						<constraint name="c2">
+							<subject type="personNameType">?=inVarJohn/personName</subject>
+							<verb>located</verb>
+							<object type="roomType">?roomNum</object>
+						</constraint>
+						<constraint name="c3">
+							<subject type="roomType">?roomNum</subject>
+							<verb>is reserved</verb>
+							<object type="militaryTime">?reservedRoomTime</object>
+						</constraint>
+					</rule>
+				</context>
+			</condition>
+			
+			<invoke serviceProvider="uwdl" portType="paper Test.xml" operation="CheckMeetingRoom" subflow="true"/>
+			<invoke serviceProvider="Company" portType="alaramServicePT" operation="alaramService" input="?mettingMember"/>
+			<invoke serviceProvider="Company" portType="showUpPT" operation="showUp" input="?fileInfo"/>
+		</node>
+		<!-- John's ManagerMeeting : End -->
+		<!-- John's MeetingStart : Start -->
+		<node name="MeetingStart">
+			<variable name="lightDown" type="LightCfg">
+				<initialize part="roomNum">
+					<from expression="501"/>
+				</initialize>
+				<initialize part="lightState">
+					<from expression="0.5"/>
+				</initialize>
+			</variable>
+			<variable name="mettingMember" type="alarmming">
+				<initialize part="alarmPerson1">
+					<from expression="?inVarJohn/personName"/>
+				</initialize>
+				<initialize part="alarmPerson2">
+					<from expression="Michele"/>
+				</initialize>
+				<initialize part="alarmPerson3">
+					<from expression="Park"/>
+				</initialize>
+			</variable>
+			<variable name="reservedTime" type="militaryTime">
+				<initialize>
+					<from expression="1300"/>
+				</initialize>
+			</variable>
+			<variable name="Current" type="militaryTime">
+				<initialize>
+					<from expression="1300"/>
+				</initialize>
+			</variable>
+			<condition expression="c1 and c2 and c3 and c4">
+				<context>
+					<rule contribute="positive">
+						<constraint name="c1">
+							<subject type="militaryTime">?Current</subject>
+							<verb>is </verb>
+							<object type="militaryTime">?reservedTime</object>
+						</constraint>
+						<constraint name="c2">
+							<subject type="personType">?=mettingMember/alarmPerson1</subject>
+							<verb>located</verb>
+							<object type="roomType">?=lightDown/roomNum</object>
+						</constraint>
+						<constraint name="c3">
+							<subject type="personType">?=mettingMember/alarmPerson2</subject>
+							<verb>located</verb>
+							<object type="roomType">?=lightDown/roomNum</object>
+						</constraint>
+						<constraint name="c4">
+							<subject type="personType">?=mettingMember/alarmPerson3</subject>
+							<verb>located</verb>
+							<object type="roomType">?=lightDown/roomNum</object>
+						</constraint>
+					</rule>
+				</context>
+			</condition>
+			<invoke serviceProvider="Company" portType="lightDownPT" operation="lightDown" input="?lightDown"/>
+		</node>
+		<!-- John's MeetingStart : End -->
+		<!-- John's BusinessReport : Start -->
+		<node name="BusinessReport">
+			<variable name="roomNum" type="roomType">
+				<initialize>
+					<from expression="302"/>
+				</initialize>
+			</variable>
+			<variable name="reservedTime" type="militaryTime">
+				<initialize>
+					<from expression="1600"/>
+				</initialize>
+			</variable>
+			<variable name="pcState" type="pcStateType">
+				<initialize>
+					<from expression="1"/><!--1 = On-->
+				</initialize>
+			</variable>
+			<variable name="Current" type="militaryTime">
+				<initialize>
+					<from expression="1600"/>
+				</initialize>
+			</variable>
+			<condition expression="c1 and c2 and c3">
+				<context>
+					<rule  contribute="positive">
+						<constraint name="c1">
+							<subject type="militaryTime">?Current</subject>
+							<verb>is </verb>
+							<object type="militaryTime">?reservedTime</object>
+						</constraint>
+						<constraint name="c2">
+							<subject type="personType">?=inVarJohn/personName</subject>
+							<verb>located</verb>
+							<object type="roomType">?roomNum</object>
+						</constraint>
+						<constraint name="c3">
+							<subject type="pcIdType">?=inVarJohn/pcId</subject>
+							<verb>is</verb>
+							<object type="stateType">?pcState</object><!-- 'On' -->
+						</constraint>
+					</rule>
+				</context>
+			</condition>
+			<invoke serviceProvider="Company" portType="businessReportPT" operation="?businessReport"/>
+		</node>
+		<!-- John's BusinessReport : End -->
+		<!-- John's sink : Start-->
+		
+		<!-- John's sink : End -->
+		<link to="SchedDisplay" from="Source"/>
+		<link to="ManagerMeeting" from="SchedDisplay"/>
+		<link to="MeetingStart" from="ManagerMeeting"/>
+		<link to="BusinessReport" from="MeetingStart"/>
+		<link to="Sink" from="BusinessReport"/>
+		
+		<sink>
+			<output name="inVarJohn" type="officeSchedule_in" >
+			</output>
+		</sink>
+	</flow>
+	<!-- John's Workflow : End -->
+	<!-- PrepareMeetingRoom Workflow(Subflow) : Start -->
+	<flow name="CheckMeetingRoom">
+		<variable name="roomCheck" type="checkRoom">
+			<initialize part="roomNum">
+				<from expression="501"/>
+			</initialize>
+			<initialize part="reservedRoomTime">
+				<from expression="1100"/>
+			</initialize>
+		</variable>
+		<Source>
+			<input name="roomCheck" type="checkRoom"/>
+		</Source>
+		<node name="CheckLights">
+			<variable name="reservedTime" type="militaryTime">
+				<initialize>
+					<from expression="1030"/>
+				</initialize>
+			</variable>
+			<variable name="Current" type="militaryTime">
+				<initialize>
+					<from expression="1030"/>
+				</initialize>
+			</variable>
+			<condition expression="c1 and c2">
+				<context>
+					<rule  contribute="positive">
+						<constraint name="c1">
+							<subject type="militaryType">?Current</subject>
+							<verb>is </verb>
+							<object type="militaryType">?reservedTime</object>
+						</constraint>
+						<constraint name="c2">
+							<subject type="roomType">?=roomCheck/roomNum</subject>
+							<verb>is reserved</verb>
+							<object type="militaryTime">?=roomCheck/reservedRoomTime</object>
+						</constraint>
+					</rule>
+				</context>
+			</condition>
+			<invoke serviceProvider="Company" portType="checkLightsPT" operation="checkLights" input="?roomCheck"/>
+		</node>
+		<node name="CheckPC">
+			<variable name="reservedTime" type="militaryTime">
+				<initialize>
+					<from expression="1030"/>
+				</initialize>
+			</variable>
+			<variable name="Current" type="militaryTime">
+				<initialize>
+					<from expression="1030"/>
+				</initialize>
+			</variable>
+			<condition expression="c1 and c2">
+				<context>
+					<rule contribute="positive">
+						<constraint name="c1">
+							<subject type="militaryTime">?Current</subject>
+							<verb>is</verb>
+							<object type="militaryTime">?reservedTime</object>
+						</constraint>
+						<constraint name="c2">
+							<subject type="roomType">?=roomCheck/roomNum</subject>
+							<verb>is reserved</verb>
+							<object type="militaryTime">?=roomCheck/reservedRoomTime</object>
+						</constraint>
+					</rule>
+				</context>
+			</condition>
+			<invoke serviceProvider="Company" portType="checkPCPT" operation="checkPC" input="?roomCheck"/>
+		</node>
+		<node name="CheckMicroPhone">
+			<variable name="reservedTime" type="militaryTime">
+				<initialize>
+					<from expression="1030"/>
+				</initialize>
+			</variable>
+			<variable name="Current" type="militaryTime">
+				<initialize>
+					<from expression="1030"/>
+				</initialize>
+			</variable>
+			<condition expression="c1 and c2">
+				<context>
+					<rule contribute="positive">
+						<constraint name="c1">
+							<subject type="militaryTime">?Current</subject>
+							<verb>is </verb>
+							<object type="militaryTime">?reservedTime</object>
+						</constraint>
+						<constraint name="c2">
+							<subject type="roomType">?=roomCheck/roomNum</subject>
+							<verb>is reserved</verb>
+							<object type="militaryTime">?=roomCheck/reservedRoomTime</object>
+						</constraint>
+					</rule>
+				</context>
+			</condition>
+			<invoke serviceProvider="Company" portType="checkMicroPhonePT" operation="checkMicroPhone" input="?roomCheck"/>
+		</node>
+		<node name="CheckProjector">
+			<variable name="reservedTime" type="militaryTime">
+				<initialize>
+					<from expression="1030"/>
+				</initialize>
+			</variable>
+			<variable name="Current" type="militaryTime">
+				<initialize>
+					<from expression="1030"/>
+				</initialize>
+			</variable>
+			<condition expression="c1 and c2">
+				<context>
+					<rule contribute="positive">
+						<constraint name="c1">
+							<subject type="militaryTime">?Current</subject>
+							<verb>is </verb>
+							<object type="militaryTime">?reservedTime</object>
+						</constraint>
+						<constraint name="c2">
+							<subject type="roomType">?=roomCheck/roomNum</subject>
+							<verb>is reserved</verb>
+							<object type="militaryTime">?=roomCheck/reservedRoomTime</object>
+						</constraint>
+					</rule>
+				</context>
+			</condition>
+			<invoke serviceProvider="Company" portType="checkProjectorPT" operation="checkProjector" input="?roomCheck"/>
+		</node>
+		<node name="FileDownload">
+			<variable name="reservedTime" type="militaryTime">
+				<initialize>
+					<from expression="1030"/>
+				</initialize>
+			</variable>
+			<variable name="fileId" type="downloadFile">
+				<initialize part="roomNum">
+					<from expression="501"/>
+				</initialize>
+				<initialize part="pcId">
+					<from expression="PC50101"/>
+				</initialize>
+			</variable>
+			<variable name="pcState" type="pcStateType">
+				<initialize>
+					<from expression="1"/><!--1 = On-->
+				</initialize>
+			</variable>
+			<variable name="Current" type="militaryTime">
+				<initialize>
+					<from expression="1030"/>
+				</initialize>
+			</variable>
+			<condition expression="c1 and c2 and c3">
+				<context>
+					<rule contribute="positive">
+						<constraint name="c1">
+							<subject type="militaryTime">?Current</subject>
+							<verb>is </verb>
+							<object type="militaryTime">?reservedTime</object>
+						</constraint>
+						<constraint name="c2">
+							<subject type="roomType">?=roomCheck/roomNum</subject>
+							<verb>is reserved</verb>
+							<object type="militaryTime">?=roomCheck/reservedRoomTime</object>
+						</constraint>
+						<constraint name="c3">
+							<subject type="pcIdType">?=fileId/pcId</subject> <!-- Room 501's PC -->
+							<verb>operates</verb>
+							<object type="stateType">?pcState</object> <!-- normal -->
+						</constraint>
+					</rule>
+				</context>
+			</condition>
+			<invoke serviceProvider="Company" portType="fileDownloadPT" operation="fileDownload" input="?fileId"/>
+		</node>
+		<node name="PlayMusic">
+			<variable name="reservedTime" type="militaryTime">
+				<initialize>
+					<from expression="1030"/>
+				</initialize>
+			</variable>
+			<variable name="Current" type="militaryTime">
+				<initialize>
+					<from expression="1030"/>
+				</initialize>
+			</variable>
+			<condition expression="c1 and c2">
+				<context>
+					<rule contribute="positive">
+						<constraint name="c1">
+							<subject type="militaryTime">?Current</subject>
+							<verb>is </verb>
+							<object type="militaryTime">?reservedTime</object>
+						</constraint>
+						<constraint name="c2">
+							<subject type="roomType">?=roomCheck/roomNum</subject>
+							<verb>is reserved</verb>
+							<object type="militaryTime">?=roomCheck/reservedRoomTime</object>
+						</constraint>
+					</rule>
+				</context>
+			</condition>
+			<invoke serviceProvider="Company" portType="playMusicPT" operation="playMusic" input="?roomCheck"/>
+		</node>
+		
+		<link to="CheckLights" from="Source"/>
+		<link to="CheckPC" from="CheckLights"/>
+		<link to="CheckMicroPhone" from="CheckPC"/>
+		<link to="CheckProjector" from="CheckMicroPhone"/>
+		<link to="FileDownload" from="CheckProjector"/>
+		<link to="PlayMusic" from="FileDownload"/>
+		<link to="Sink" from="PlayMusic"/>
+		
+		<sink>
+			<output name="roomCheck" type="checkRoom"></output>
+		</sink>
+	</flow>
+	<!-- PrepareMeetingRoom Workflow(CheckMeetingRoom Subflow) : End -->
+</uWDL>

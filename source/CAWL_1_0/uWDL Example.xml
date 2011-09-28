@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--<uWDL xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns="http://www.uflow.org/uWDL2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.uflow.org/uWDL2 E:\1FDF6~1._연\2EEA4~1._연\04990~1._유\0844A~1._관\56908~1._시\050A1~1._시\31FCC~1._테\uWDL2.xsd">  -->
+	
+<uWDL name="fffffffffffff" version="2.0.1" targetNamespace="asdf">
+	<documentation>aaa</documentation>
+
+	<baseOntologies>
+		<ontology location="http://anyURL" namespace="http://anyURL"/>
+	</baseOntologies>
+	
+	<message name="OfficeSchdule_In">
+		<part name="person" type="Person"/>
+		<part name="officeRoom" type="OfficeRoom"/>
+		<part name="officeDesk" type="OfficeDesk"/>
+		<part name="currentTime" type="MilitaryTime"/>
+	</message>
+	
+	<!-- <variable name="pcState" type="MachineState_In">를 SchedDisplay node로 이동 -->
+	
+	<variable name="inVar" type="OfficeSchdule_In">
+		<initialize part="person">
+			<from expression = "John"/>
+		</initialize>
+		<initialize part="officeRoom">
+			<from expression = "313"/>
+		</initialize>
+		<initialize part="officeDesk">
+			<from expression = "10"/>
+		</initialize>
+		<initialize part="currentTime">
+			<from expression = "0900"/>
+		</initialize>
+	</variable>
+	<variable name="user" type="OfficeMember">
+		<initialize>
+			<from expression="John"/>
+		</initialize>
+	</variable>
+	<variable name="officeRoomNum" type="OfficeRoom">
+		<initialize>
+			<from expression="313"/>
+			<!-- 일정을 관리하고자 하는 사람의 방번호를 시스템으로부터 받아 초기화한다.-->
+		</initialize>
+		<!-- 온톨로지가 구축된 경우 Xpath의 경로 설정을 통해 방정보값을 얻어 온다. -->
+	</variable>
+	<variable name="officeDeskNum" type="OfficeDesk">
+		<initialize>
+			<from expression="10"/>
+			<!-- 10번 = John의 책상 번호 -->
+		</initialize>
+	</variable>
+	<variable name="startTime" type="MilitaryTime">
+		<initialize>
+			<from expression="0900"/>
+		</initialize>
+	</variable>
+	<variable name="consultingTime" type="MilitaryTime">
+		<initialize>
+			<from expression="1300"/>
+		</initialize>
+	</variable>
+	<!-- John은 자신의 일정을 PDA에 기록하여 저장한 후, 오전9시 이전에 본인의 책상 앞에 앉으면 -->
+	<!-- 플로우가 활성화되면서 사무일정 서비스를 제공받기 시작한다. -->
+	<activator name="OfficeSchedule_Activator">
+		<condition expression="c1 and c2 and c3 and c4">
+			<context>
+				<rule contribute="positive">
+					<constraint name="c1">
+						<subject type="Person">?=inVar/person</subject>
+						<verb>is</verb>
+						<object type="OfficeMember">?user</object>
+					</constraint>
+					<constraint name="c2">
+						<subject type="OfficeRoom">?=inVar/officeRoom</subject>
+						<verb>is</verb>
+						<object type="OfficeRoom">?officeRoomNum</object>
+					</constraint>
+					<constraint name="c3">
+						<subject type="OfficeMember">?user</subject>
+						<verb>locate</verb>
+						<object type="OfficeRoom">?officeRoomNum</object>
+					</constraint>
+					<constraint name="c4">
+						<subject type="MilitaryTime">?=inVar/currentTime</subject>
+						<verb>&lt;</verb>
+						<object type="MilitaryTime">?startTime</object>
+					</constraint>
+				</rule>
+			</context>
+		</condition>
+		<activate flow="OfficeSchedule_Flow"/>
+	</activator>
+	
+	<flow name="OfficeSchedule_Flow">
+	<!--    <source name="Source"> -->
+		<source>
+			<!-- Definition of an input variable of the OfficeSchedule_Flow -->
+			<input name="inVar" type="OfficeSchedule_In"/>
+		</source>
+		<!-- 출근하여 본인의 책상 앞에 앉으면 회사내의 일정 관리 프로그램을 통해-->
+		<!-- 하루의 일정을 화면으로 보여주는 서비스를 제공받는다.-->
+		<node name="SchedDisplay">
+			<message name="MachineState_In">
+				<part name="state" type="MachineState"/>
+			</message>
+			<variable name="pcState" type="MachineState_In">
+				<initialize part="state">
+					<from expression="off"/>
+					<!-- 313호 pc에 이상이 있어 310호에서 미팅 진행 -->
+				</initialize>
+			</variable>
+			<variable name="state" type="PC">
+				<initialize>
+					<from expression="off"/>
+				</initialize>
+			</variable>
+			<variable name="schedule" type="SchedDisplay_In"/>
+			<condition expression="c1 and c2 and c3 and c4 and c5">
+				<context>
+					<rule contribute="positive">
+						<constraint name="c1">
+							<subject type="Person">?=inVar/person</subject>
+							<verb>is</verb>
+							<object type="OfficeMember">?user</object>
+							<!-- ?user = John -->
+						</constraint>
+						<constraint name="c2">
+							<subject type="OfficeMember">?user</subject>
+							<verb>locate</verb>
+							<object type="OfficeRoom">?officeRoomNum</object>
+						</constraint>
+						<constraint name="c3">
+							<subject type="OfficeMember">?user</subject>
+							<verb>locate</verb>
+							<object type="OfficeDesk">?officeDeskNum</object>
+							<!-- 10번 = John의 책상 번호 -->
+						</constraint>
+						<constraint name="c4">
+							<subject type="MilitaryTime">?=inVar/currentTime</subject>
+							<verb>&lt;</verb>
+							<object type="MilitaryTime">?startTime</object>
+						</constraint>
+						<constraint name="c5">
+							<subject type="MachineState">?=pcState/state</subject>
+							<verb>is</verb>
+							<object type="PC">?state</object>
+						</constraint>
+					</rule>
+				</context>
+			</condition>
+			<invoke serviceProvider="Company" portType="SchedDisplay_PT" operation="SchedDisplay" input="?user" output="schedule"/>
+			<synchronize/>
+		</node>
+		
+		<!-- 오전 10시 Kim씨가 회의실에 들어서면 회의에 사용될 발표자료(PPT)를 회의실(313호)에 있는 컴퓨터로 다운로드 한다.-->
+		<node name="MeetingPreparation1">
+			<message name="meetingRoom_In">
+				<part name="meetingRoom" type="MeetingRoom"/>
+			</message>
+			<variable name="meetingRoomNum" type="meetingRoom_In">
+				<initialize part="meetingRoom">
+					<from expression="313"/>
+				</initialize>
+			</variable>
+			<variable name="reservedRoomNum" type="MeetingPreparation">
+				<initialize>
+					<from expression="313"/>
+					<!--일정에 잡혀 있는 회의 방번호로 초기화 -->
+				</initialize>
+			</variable>
+			<variable name="meetingTime" type="MilitaryTime">
+				<initialize>
+					<from expression="1000"/>
+					<!-- meetingTime = 1000시 -->
+				</initialize>
+			</variable>
+			<variable name="presentationFile" type="MeetingPreparation"/>
+			<condition expression="c1 and c2 and c3 and c4">
+				<!-- <case name="pcStateCheck" expression="?pcState &lt;&gt; Normal"/> -->
+				<!-- &lt;gt;  <>  equal sign 대신 사용함 -->
+				<context>
+					<rule contribute="positive">
+						<constraint name="c1">
+							<subject type="Person">?=inVar/person</subject>
+							<verb>is</verb>
+							<object type="OfficeMember">?user</object>
+						</constraint>
+						<constraint name="c2">
+							<subject type="MeetingRoom">?=meetingRoomNum/meetingRoom</subject>
+							<verb>is</verb>
+							<object type="MeetingPreparation">?reservedRoomNum</object>
+						</constraint>
+						<constraint name="c3">
+							<subject type="OfficeMember">?user</subject>
+							<verb>locate</verb>
+							<object type="MeetingPreparation">?reservedRoomNum</object>
+							<!-- reservedRomNum = 313호 -->
+						</constraint>
+						<constraint name="c4">
+							<subject type="MilitaryTime">?=inVar/currentTime</subject>
+							<verb>is</verb>
+							<object type="MilitaryTime">?meetingTime</object>
+						</constraint>
+					</rule>
+				</context>
+			</condition>
+			<invoke serviceProvider="Company" portType="DownloadPT" operation="download" input="user" output="presentationFile"/>
+			<synchronize/>
+		</node>
+		<!-- 회의실의 컴퓨터에 이상이 있는 경우, 사전에 임시로 사용하기로 된 310호 회의실로 발표자료를 다운로드한다. -->
+		<!-- 회의시간은 10분 후로 한다. -->
+		
+		<!-- 오후 1시(1300시)에 311호에서 예약된 고객과의 상담을 위한 -->
+		<!-- 상담자의 작업환경을 311호의 컴퓨터로 옮겨주는 마이그레이션 서비스를 제공한다. -->
+		<node name="Consulting">
+			<message name="ConsultingRoom_In">
+				<part name="consultingRoom" type="ConsultingRoom"/>
+			</message>
+			<variable name="inConsult" type="ConsultingRoom_In">
+				<initialize part="consultingRoom">
+					<from expression="311"/>
+				</initialize>
+			</variable>
+			<variable name="consultingRoomNum" type="ConsultingPreparation">
+				<initialize>
+					<from expression="311"/>
+					<!--일정에 잡혀 있는 상담 방번호로 초기화 -->
+				</initialize>
+			</variable>
+			<condition expression="c1 and c2 and c3 and c4">
+				<context>
+					<rule contribute="positive">
+						<constraint name="c1">
+							<subject type="Person">?=inVar/person</subject>
+							<verb>is</verb>
+							<object type="OfficeMember">?user</object>
+						</constraint>
+						<constraint name="c2">
+							<subject type="ConsultingRoom">?=inConsult/consultingRoom</subject>
+							<verb>is</verb>
+							<object type="ConsultingPreparation">?consultingRoomNum</object>
+						</constraint>
+						<constraint name="c3">
+							<subject type="OfficeMember">?user</subject>
+							<verb>locate</verb>
+							<object type="MeetingPreparation">?consultingRoomNum</object>
+							<!-- consultingRomNum = 311호 -->
+						</constraint>
+						<constraint name="c4">
+							<subject type="MilitaryTime">?=inVar/currentTime</subject>
+							<verb>is</verb>
+							<object type="MilitaryTime">?consultingTime</object>
+						</constraint>
+					</rule>
+				</context>
+			</condition>
+			<invoke serviceProvider="Company" portType="MigrationPT" operation="migration" input="user" output="dataOfUser"/>
+			<invoke serviceProvider="uwdl" portType="uWDL Example.xml" operation="subflow" subflow="true"/>
+			<synchronize/>
+		</node>
+		<!-- Link Definition -->
+		<link from="Source" to="SchedDisplay"/>
+		<link from="SchedDisplay" to="MeetingPreparation1"/>
+		<link from="SchedDisplay" to="MeetingPreparation2"/>
+		<!-- <link from="MeetingPreparation" to="Consulting"></link> -->
+		<link from="MeetingPreparation1" to="Consulting"/>
+		
+		<link from="Consulting" to="Sink"/>
+		<sink>
+			<output name="test" type="String"></output>
+		</sink>
+	</flow>
+	
+	
+	<!--  내맘대로 flow -->
+	<!-- subflow test용 flow -->
+	<flow name="subflow">
+	<source>
+			<!-- Definition of an input variable of the OfficeSchedule_Flow -->
+			<input name="inVar" type="OfficeSchedule_In"/>
+	</source>
+	
+	<node name="MeetingPreparation2">
+			<message name="meetingRoom_In">
+				<part name="meetingRoom" type="MeetingRoom"/>
+			</message>
+			<variable name="meetingRoomNum" type="meetingRoom_In">
+				<initialize part="meetingRoom">
+					<from expression="310"/>
+				</initialize>
+			</variable>
+			<variable name="reservedRoomNum" type="MeetingPreparation">
+				<initialize>
+					<from expression="312"/>
+					<!--비어있는 회의실 -->
+				</initialize>
+			</variable>
+			<variable name="meetingTime" type="MilitaryTime">
+				<initialize>
+					<from expression="1010"/>
+					<!-- meetingTime = 1010시 -->
+				</initialize>
+			</variable>
+			<variable name="presentationFile" type="MeetingPreparation"/>
+			<condition expression="c1 and c2 and c3 and c4">
+				<!--  <case name="pcStateCheck" expression="?pcState &lt;&gt; abNormal"/>  -->
+				<!-- &lt;gt;  <>  equal sign 대신 사용함 -->
+				<context>
+					<rule contribute="positive">
+						<constraint name="c1">
+							<subject type="uflow:Person">?=inVar/person</subject>
+							<verb>is</verb>
+							<object type="OfficeMember">?user</object>
+						</constraint>
+						<constraint name="c2">
+							<subject type="MeetingRoom">?=meetingRoomNum/meetingRoom</subject>
+							<verb>is</verb>
+							<object type="MeetingPreparation">?reservedRoomNum</object>
+						</constraint>
+						<constraint name="c3">
+							<subject type="OfficeMember">?user</subject>
+							<verb>locate</verb>
+							<object type="MeetingPreparation">?reservedRoomNum</object>
+							<!-- reservedRomNum = 312호 -->
+						</constraint>
+						<constraint name="c4">
+							<subject type="uflow:MilitaryTime">?=inVar/currentTime</subject>
+							<verb>is</verb>
+							<object type="MilitaryTime">?meetingTime</object>
+						</constraint>
+					</rule>
+				</context>
+			</condition>
+			<invoke serviceProvider="Company" portType="DownloadPT" operation="download" input="user" output="presentationFile"/>
+			<synchronize/>
+		</node>
+		
+		<link from="Source" to="MeetingPreparation2"/>
+		<link from="MeetingPreparation2" to="Sink"/>
+		
+		<sink>
+			<output name="test2" type="String"></output>
+		</sink>
+		
+		
+	</flow>
+</uWDL>

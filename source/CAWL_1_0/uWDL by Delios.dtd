@@ -1,0 +1,103 @@
+<!ELEMENT uWdl (Source, Node*, Link*, Sink*)>
+<!ATTLIST Uwdl
+	version		CDATA		"0.1"	#FIXED
+	log			CDATA		"0"		#IMPLIED
+>
+
+<!ELEMENT Source (#PCDATA)>
+
+<!ELEMENT Node (Description?, (Uflow | Services))>
+<!ATTLIST Node
+	name		CDATA				#REQUIRED
+	log			CDATA		"0"		#IMPLIED
+>
+
+<!ELEMENT Description (#PCDATA)>
+
+<!ELEMENT Uflow (Location)>
+
+<!ELEMENT Location (#PCDATA)>
+
+<!ELEMENT Service (Wsdl, PortType, Operation)>
+
+<!ELEMENT Wsdl (#PCDATA)>
+
+<!ELEMENT PortType (#PCDATA)>
+
+<!ELEMENT Operation (#PCDATA)>
+
+<!ELEMENT Link (Case+)>
+<!ATTLIST Link
+	nodeName	CDATA				#REQUIRED
+>
+
+<!ELEMENT Case (Condition, Action)>
+<!ATTLIST Case
+	type		(default | final)	"default"	#IMPLIED
+>
+
+<!ELEMENT Condition (Context | Profile | Event | Correlation | Result)>
+
+<!ELEMENT Context (Rule+)>
+
+<!ELEMENT Rule (Constraint+)>
+
+<!ELEMENT Constraint (Subject, Verb, Object)>
+<!ATTLIST Constraint 
+	type		(AND | OR)	"AND"	#IMPLIED
+>
+
+<!ELEMENT Profile (Customization+)>
+
+<!ELEMENT Customization >
+<!ATTLIST Customization
+	type		(AND | OR)	"AND"	#IMPLIED
+	subject	CDATA				#REQUIRED
+	verb		CDATA				#REQUIRED
+	object		CDATA				#REQUIRED
+>
+
+<!ELEMENT Subject (#PCDATA)>
+<!ATTLIST Subject
+	type		CDATA				#REQUIRED
+>
+
+<!ELEMENT Verb (#PCDATA)>
+<!ATTLIST Verb
+	type		CDATA 			#REQUIRED
+>
+
+<!ELEMENT Object (#PCDATA)>
+<!ATTLIST Object
+	type		CDATA 			#REQUIRED
+>
+
+<!ELEMENT Event	(Property+)>
+<!ATTLIST Event
+	type		(true | false)	"true"	#IMPLIED
+>
+
+<!ELEMENT Property (#PCDATA)>
+
+<!ELEMENT Correlation (Join+)>
+
+<!ELEMENT Join (Target, State)>
+
+<!ELEMENT Target (#PCDATA)>
+
+<!ELEMENT State (#PCDATA)>
+
+<!ELEMENT Result (#PCDATA)>
+
+<!ELEMENT Action (Export | Transition)>
+
+<!ELEMENT Export (Port)>
+<!ATTLIST Export
+	type		CDATA				#REQUIRED
+>
+
+<!ELEMENT Port (#PCDATA)>
+
+<!ELEMENT Transition (#PCDATA)>
+
+<!ELEMENT Sink (#PCDATA)>
