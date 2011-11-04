@@ -295,13 +295,19 @@ public class SaxUnParser implements SaxVisitor {
 		open( sink );
 		if( sink.getSynchronize()!=null )
 			visit( sink.getSynchronize() );
-		visit( sink.getOutput() );
+		UOutput uOutput = sink.getOutput();
+		if( uOutput!=null ) {
+			visit( uOutput );
+		}
 		close( sink );
 	}
 	
 	public void visit(USource source) {
 		open( source );
-		visit(source.getInput());
+		UInput uInput = source.getInput();
+		if(uInput!=null) {
+			visit(uInput);	
+		}
 		close( source );
 	}
 	

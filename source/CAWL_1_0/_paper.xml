@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CAWL name="MTRoomService" version="1.0.1" targetNamespace="RobotServiceTest">
+	<documentation>Meeting Room Services using LEGO Robots</documentation>
+	<baseOntologies>
+		<ontology namespace="http://ss.ssu.ac.kr/Ontology" location="http://ss.ssu.ac.kr/Ontology/CAWL"/>
+	</baseOntologies>
+
+	<serviceProvider name="ssCom" type="Company" >
+		<locator type="static"/>
+	</serviceProvider>
+	
+	<message name="msg4MTRoomService">
+		<part name="officeRoomNum" type="Room"/>	
+	</message>
+	
+	<variable name="var4MTRoomService" type="msg4MTRoomService">
+		<initialize part="officeRoomNum"><from expression="313"/></initialize> 
+	</variable>	
+		
+	<activator name="TomFarmServiceActivator">
+		<condition expression="C1">
+			<context>
+				<rule contribute="positive">
+					<constraint name="C1">
+						<subject type="Person">Tom</subject>
+						<verb>isLocated</verb>
+						<object type="Room">Seoul</object>
+					</constraint>
+				</rule>
+			</context>
+		</condition>
+
+		<activate flow="MorningCallFlow"/>
+		<activate flow="VentilatorFlow"/>
+		<activate flow="DoorFlow"/>
+	</activator>
+	
+	<flow name="MorningCallFlow">
+		<source>
+		</source>
+
+		<node name="MorningCall">
+			<condition expression="C1 and C2">
+				<context>
+					<rule contribute="positive">
+						<constraint name="C1">
+							<subject type="Person">Seoul</subject>
+							<verb>hasAMPM</verb>
+							<object type="AMPM">AM</object>
+						</constraint>
+						<constraint name="C2">
+							<subject type="HumiditySensor">VinylhouseLightSensor</subject>
+							<verb>hasLight</verb>
+							<object type="Light">Bright</object>
+						</constraint>
+					</rule>
+				</context>
+			</condition>
+
+			<invoke serviceProvider="ssCom" portType="" operation="MorningCall" input=""/>
+		</node>
+
+		<link from="source" to="MorningCall"/>
+		<link from="MorningCall" to="sink" />
+
+		<sink>
+		</sink>
+	</flow>
+
+	<flow name="VentilatorFlow">
+		<source>
+		</source>
+
+		<node name="TurnOnVentilator">
+			<condition expression="C1">
+				<context>
+					<rule contribute="positive">
+						<constraint name="C1">
+							<subject type="HumiditySensor">VinylhouseHumiditySensor</subject>
+							<verb>hasHumidity</verb>
+							<object type="Humidity">60</object>
+						</constraint>
+					</rule>
+				</context>
+			</condition>
+
+			<invoke serviceProvider="ssCom" portType="" operation="TurnOnVentilator" input=""/>
+		</node>
+
+		<node name="TurnOffVentilator">
+			<condition expression="C1">
+				<context>
+					<rule contribute="positive">
+						<constraint name="C1">
+							<subject type="HumiditySensor">VinylhouseHumiditySensor</subject>
+							<verb>hasHumidity</verb>
+							<object type="Humidity">30</object>
+						</constraint>
+					</rule>
+				</context>
+			</condition>
+
+			<invoke serviceProvider="ssCom" portType="" operation="TurnOffVentilator" input=""/>
+		</node>
+
+		<link from="source" to="TurnOnVentilator"/>
+		<link from="TurnOnVentilator" to="TurnOffVentilator"/>
+		<link from="TurnOffVentilator" to="sink"/>
+
+		<sink>
+		</sink>
+	</flow>
+
+	<flow name="DoorFlow">
+		<source>
+		</source>
+
+		<node name="OpenDoor">
+			<condition expression="C1 and C2">
+				<context>
+					<rule contribute="positive">
+						<constraint name="C1">
+							<subject type="TemperatureSensor">VinylHouseTemperatureSensor</subject>
+							<verb>hasTemperatureValue</verb>
+							<object type="Temperature">30</object>
+						</constraint>
+					</rule>
+				</context>
+			</condition>
+
+			<invoke serviceProvider="ssCom" portType="" operation="OpenDoor" input=""/>
+		</node>
+
+		<node name="CloseDoor">
+			<condition expression="C1">
+				<context>
+					<rule contribute="positive">
+						<constraint name="C1">
+							<subject type="TemperatureSensor">VinylHouseTemperatureSensor</subject>
+							<verb>hasTemperatureValue</verb>
+							<object type="Temperature">20</object>
+						</constraint>
+					</rule>
+				</context>
+			</condition>
+
+			<invoke serviceProvider="ssCom" portType="" operation="CloseDoor" input=""/>
+		</node>
+		
+		<link from="source" to="OpenDoor"/>
+		<link from="OpenDoor" to="CloseDoor"/>
+		<link from="CloseDoor" to="sink" />
+
+		<sink>
+		</sink>
+	</flow>
+</CAWL>
+
+
+
+
+

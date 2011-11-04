@@ -5,15 +5,15 @@ import java.util.ArrayList;
 import org.uwdl.parser.ast.UNSync;
 import org.uwdl.parser.ast.USynchronize;
 
-public class ThreadList {
+public class UNodeThreadList {
 	private String from;
 	private ArrayList<UNodeThread> nodeThreads;
 	
-	ThreadList() {
+	UNodeThreadList() {
 		this.nodeThreads = new ArrayList<UNodeThread>();
 	}
 	
-	ThreadList(String from) {
+	UNodeThreadList(String from) {
 		this.from = from;
 		this.nodeThreads = new ArrayList<UNodeThread>();
 	}

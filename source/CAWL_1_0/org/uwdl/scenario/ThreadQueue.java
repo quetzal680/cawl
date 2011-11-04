@@ -3,11 +3,11 @@ package org.uwdl.scenario;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class ThreadQueue extends Thread {
+public class ThreadQueue {
 	private final Queue<UNodeThread> queue = new LinkedList<UNodeThread>();
 	
 	public synchronized UNodeThread getUNodeThread(UNodeThread nodeThread) {
-		while( queue.peek()==null ) {
+		while( queue.peek()==null || !queue.contains(nodeThread) ) {
 			try {
 				wait();
 			} catch (InterruptedException e) {
