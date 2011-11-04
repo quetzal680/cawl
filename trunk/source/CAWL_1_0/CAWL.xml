@@ -55,7 +55,7 @@
 	<uflow:variable type="militaryTime" name="crtTime">
 		<uflow:documentation> 현재시간은 시스템으로부터 제공받음, 00:00시로 초기화함 </uflow:documentation>
 		<uflow:initialize part="currentTime">
-			<uflow:from expression="00:00"/>
+			<uflow:from expression="0900"/>
 		</uflow:initialize> 
 	</uflow:variable>
 	<uflow:variable type="URC" name="robot307"/>	
@@ -78,7 +78,7 @@
 					<uflow:constraint name="const1">
 						<uflow:subject type="militaryTime">?=crtTime/currentTime</uflow:subject>
 						<uflow:verb>is</uflow:verb>
-						<uflow:object type="militaryTime">?rsvTime</uflow:object>
+						<uflow:object type="militaryTime">0900</uflow:object>
 					</uflow:constraint>
 				</uflow:rule>
 			</uflow:context>
@@ -118,7 +118,7 @@
 						<uflow:constraint name="C2">
 							<uflow:subject type="militaryTime">?=crtTime/currentTime</uflow:subject>
 							<uflow:verb>is</uflow:verb>
-							<uflow:object type="militaryTime">?=rsvTime</uflow:object>
+							<uflow:object type="militaryTime">?=rsvTime/reservedTime</uflow:object>
 						</uflow:constraint>
 					</uflow:rule>
 				</uflow:context>
@@ -160,7 +160,7 @@
 						<uflow:constraint name="C3">
 							<uflow:subject type="militaryTime">?=crtTime/currentTime</uflow:subject>
 							<uflow:verb>is</uflow:verb>
-							<uflow:object type="militaryTime">?=rsvTime</uflow:object>
+							<uflow:object type="militaryTime">?=rsvTime/resevedTime</uflow:object>
 						</uflow:constraint>
 					</uflow:rule>
 				</uflow:context>
@@ -197,7 +197,7 @@
 							<uflow:constraint name="C1">
 							<uflow:subject type="militaryTime">?crtTime/currentTime</uflow:subject>
 							<uflow:verb>is</uflow:verb>
-							<uflow:object type="militaryTime">?rsvTime4Tea</uflow:object>
+							<uflow:object type="militaryTime">?rsvTime4Tea/reservedTime</uflow:object>
 						</uflow:constraint>
 					</uflow:rule>
 				</uflow:context>
@@ -217,7 +217,7 @@
 							<uflow:constraint name="C1">
 							<uflow:subject type="militaryTime">?crtTime/currentTime</uflow:subject>
 							<uflow:verb>is</uflow:verb>
-							<uflow:object type="militaryTime">?rsvTime4MVup</uflow:object>
+							<uflow:object type="militaryTime">?rsvTime4MVup/reservedTime</uflow:object>
 						</uflow:constraint>
 					</uflow:rule>
 				</uflow:context>
@@ -266,7 +266,7 @@
 						<uflow:constraint name="C1">
 							<uflow:subject type="militaryTime">currentTime</uflow:subject>
 							<uflow:verb>is</uflow:verb>
-							<uflow:object type="militaryTime">?rsvTime4LightInfo</uflow:object>
+							<uflow:object type="militaryTime">?rsvTime4LightInfo/reservedTime</uflow:object>
 						</uflow:constraint>
 						<uflow:constraint name="C2">
 							<uflow:subject type="Person">?=inVarUser/personName</uflow:subject>
@@ -292,7 +292,7 @@
 						<uflow:constraint name="C1">
 							<uflow:subject>?=robot2userDistance/R2U-Distance</uflow:subject>
 							<uflow:verb>lt</uflow:verb>
-							<uflow:object>?effectiveDistance</uflow:object>
+							<uflow:object>?effectiveDistance/R2U-Distance</uflow:object>
 						</uflow:constraint>
 					</uflow:rule>
 				</uflow:context>
