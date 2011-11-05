@@ -28,13 +28,12 @@ public class ScenarioFlow extends Thread {
 	private ScenarioEntitySet sensorData = null;
 	private uWDLMapper mapper = null;
 
-	private ThreadQueue threadQueue = null;
 	private Hashtable<String, UNodeThread> threads = null;
 	
 	private Hashtable<String, Vector<String>> tmpLinks = null;
 
 	public ScenarioFlow(UFlow flow, uWDLMapper mapper) {
-		System.out.println("\n[FLOW:" + flow.getName() + "] State create");
+		System.out.println("\n[FLOW] <" + flow.getName() + "> State create");
 		
 		this.flow = flow;
 		this.mapper = mapper;
@@ -43,7 +42,6 @@ public class ScenarioFlow extends Thread {
 
 		threads = new Hashtable<String, UNodeThread>();
 		
-		threadQueue = new ThreadQueue();
 		tmpLinks = new Hashtable<String, Vector<String>>();
 
 		initThread();
