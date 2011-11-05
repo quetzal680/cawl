@@ -18,6 +18,7 @@ import javax.xml.validation.Validator;
 import org.sspl.sax.SaxContentHandler;
 import org.sspl.sax.SaxUnParser;
 import org.uwdl.entities.ScenarioEntitySet;
+import org.uwdl.mapper.ContextComparator;
 import org.uwdl.mapper.uWDLMapper;
 import org.uwdl.parser.uWDLLexer;
 import org.uwdl.parser.uWDLParser;
@@ -25,6 +26,7 @@ import org.uwdl.parser.uWDLUnparser;
 import org.uwdl.parser.ast.UActivate;
 import org.uwdl.parser.ast.UActivator;
 import org.uwdl.parser.ast.UFlow;
+import org.uwdl.parser.ast.UOntology;
 import org.uwdl.parser.ast.UUWDL;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -35,10 +37,10 @@ public class ScenarioTest {
 	
 	public static void main(String[] args) throws Exception {
 		UUWDL uWDL;
-		String xmlFile = "__test.xml";
+//		String xmlFile = "__test.xml";
 //		String xmlFile = "scenario5.xml";
 //		String xmlFile = "CAWL.xml";
-//		String xmlFile = "_paper.xml";
+		String xmlFile = "_paper.xml";
 		String schemaFile = "/root/Dropbox/workspace/uwdl/1_uWDL2_0_pre_a/CAWL_v1.0.xsd";
 		
 		System.out.println("valid check");
@@ -61,7 +63,7 @@ public class ScenarioTest {
 		// 5. Check the document
 //		try {
 //			validator.validate(source);
-//			System.out.println(xmlFile + " is valid.\n");
+			System.out.println(xmlFile + " is valid.\n");
 			
 			// 파서 공장 생성
 			SAXParserFactory parserFactory = SAXParserFactory.newInstance();
@@ -91,11 +93,16 @@ public class ScenarioTest {
 				
 		        System.out.println("\n----------------- simulating start ------------------");
 		        //Hashtable<String, UFlow> flowSet = new Hashtable<String, UFlow>();
+		        ContextComparator comparator = null;
+		        for( UOntology uOntology : uWDL.getBaseOntologies().getOntologies()) {
+		        	comparator = new ContextComparator(uOntology.getLocation());	
+		        }
 		        uWDLMapper mapper = new uWDLMapper(); 
 		        ScenarioEntitySet sensorData = ScenarioEntitySet.getInstance();
 		        
 		        UActivator[] activator = uWDL.getActivators();
 		        UFlow[] flows = uWDL.getFlows();
+		        
 		        
 		        for(UFlow flow : flows)
 		        	flowSet.put(flow.getName(), flow);
@@ -106,8 +113,11 @@ public class ScenarioTest {
 //		        	return ;
 		        
 //		        if (mapper.find(sensorData.getEntities(activator[0].getName()), activator[0].getCondition())) {
-		        	System.out.print("activator condition : ");
-		        	System.out.println("OK");
+		        
+		        
+		        System.out.println("activator condition check");
+		        if ( comparator.reasoner("Tom", "locatedIn", "Seoul") ) {
+		        	System.out.println("activator condition check OK");
 		        	
 		        	UActivate[] activate = activator[0].getActivates();
 		        	System.out.println(activate[0].getFlow() + " execute");
@@ -117,7 +127,7 @@ public class ScenarioTest {
 			        	ScenarioFlow scenarioFlow = new ScenarioFlow(flow, mapper);
 			        	scenarioFlow.start();
 		        	}
-//		        }
+		        }
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (ParserConfigurationException e) {

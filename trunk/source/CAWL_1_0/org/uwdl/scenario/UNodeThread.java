@@ -60,13 +60,6 @@ public class UNodeThread extends Thread{
 					UFlow flow = ScenarioTest.flowSet.get(invoke.getOperation());
 					ScenarioFlow sub = new ScenarioFlow(flow, mapper);
 					sub.start();
-					
-//		        	for(UActivate uActivate : activator[0].getActivates()) {
-//			        	UFlow flow = flowSet.get(uActivate.getFlow());
-//			        	ScenarioFlow scenarioFlow = new ScenarioFlow(flow, mapper);
-//			        	scenarioFlow.start();
-//		        	}
-					
 				}
 				else {
 					System.out.println(((UInvoke)descendant));
@@ -90,9 +83,11 @@ public class UNodeThread extends Thread{
 		for( String toString : toStrings ) {
 			UNodeThread nodeThread = threads.get(toString);
 			if( nodeThread!=null ) {
-				if( nodeThread.getState()==Thread.State.NEW ) {
-					System.out.println("<" + nodeThread.getNode().getName() + "> <" +nodeThread.getName()+">");
-					nodeThread.execute(threads, links);				
+				synchronized (nodeThread) {
+					if( nodeThread.getState()==Thread.State.NEW ) {
+						System.out.println("<" + nodeThread.getNode().getName() + "> <" +nodeThread.getName()+">");
+						nodeThread.execute(threads, links);
+					}
 				}
 			}
 		}
