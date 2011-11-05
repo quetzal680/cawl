@@ -22,7 +22,9 @@
 			</context>
 		</condition>
 		<activate flow="MTRoomServiceFlow"/>
+<!--
 		<activate flow="MusicTeaRobotServiceFlow"/>
+-->
 	</activator>
 	
 	<flow name="MTRoomServiceFlow">
@@ -55,6 +57,9 @@
 					</rule>
 				</context>
 			</condition>
+<!--
+			<invoke serviceProvider="uwdl" operation="MusicTeaRobotServiceFlow"/>
+-->
 		</node>
 
 		<node name="N3">
@@ -172,7 +177,7 @@
 		<link from="DownloadFile" to="sink" />
 -->			
 		<link from="source" to="N1"/>
-			<link from="N1" to="N2"/> <link from="N2" to="N4"/> <link from="N4" to="N2" />
+			<link from="N1" to="N2"/> <link from="N2" to="N4"/> <link from="N4" to="N9" />
 			<link from="N1" to="N3"/> 
 				<link from="N3" to="N6" /> <link from="N6" to="N7" /> <link from="N7" to="N8" />
 				<link from="N3" to="N5" /> <link from="N5" to="N8" />
@@ -202,7 +207,6 @@
 					</rule>
 				</context>
 			</condition>
-			<invoke serviceProvider="ssCom" portType="ArmMoveDownPT" operation="moveLegoService"  input="?reqMoveDown"/>
 		</node>
 					
 		<node name="MoveUpMusic">
@@ -217,8 +221,11 @@
 					</rule>
 				</context>
 			</condition>
+<!--
 			<invoke serviceProvider="ssCom" portType="ArmMoveUpPT" operation="moveLegoService" input="?reqMoveUp"/>
 			<invoke serviceProvider="ssCom" portType="MusicPreparationPT" operation="musicService" input="?reqPlayMusic"/>
+-->
+			<invoke serviceProvider="uwdl" operation="MusicTeaRobotServiceFlow"/>
 		</node>
 			
 		<link to="MoveDown" from="source"/>
