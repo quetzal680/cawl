@@ -58,11 +58,11 @@ public class SaxContentHandler implements ContentHandler {
 	
 	// 시작 태그를 만났을 때 발생하는 이벤트를 처리하는 메소드
 	public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
-		for(int i=0; i<count; i++) {
-			System.out.print(" ");
-		}
-		System.out.println("<" + localName + ">");
-		count++;
+//		for(int i=0; i<count; i++) {
+//			System.out.print(" ");
+//		}
+//		System.out.println("<" + localName + ">");
+//		count++;
 		
 		switch( CawlToken.value(localName.toUpperCase()) )
 		{
@@ -313,11 +313,11 @@ public class SaxContentHandler implements ContentHandler {
 	
 	// 끝 태그를 만났을 때 발생하는 이벤트를 처리하는 메소드
 	public void endElement(String uri, String localName, String qName) throws SAXException {
-		count--;
-		for(int i=0; i<count; i++) {
-			System.out.print(" ");
-		}
-		System.out.println("</" + localName + ">");
+//		count--;
+//		for(int i=0; i<count; i++) {
+//			System.out.print(" ");
+//		}
+//		System.out.println("</" + localName + ">");
 		
 		switch( CawlToken.value(localName.toUpperCase()) )
 		{
@@ -420,7 +420,10 @@ public class SaxContentHandler implements ContentHandler {
 	    			}
 //    				throw new UnvalidVariableException();
 	    		}
-				System.out.println("tmp : " + tmp);
+//for(int i=0; i<count; i++) {
+//	System.out.print(" ");
+//}
+//System.out.println("tmp : " + tmp);
 			}
 		}
 		if(tmp==null)
