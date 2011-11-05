@@ -2,7 +2,7 @@
 <CAWL name="MTRoomService" version="1.0.1" targetNamespace="RobotServiceTest">
 	<documentation>Meeting Room Services using LEGO Robots</documentation>
 	<baseOntologies>
-		<ontology namespace="http://ss.ssu.ac.kr/Ontology" location="http://ss.ssu.ac.kr/Ontology/CAWL"/>
+		<ontology namespace="http://ss.ssu.ac.kr/Ontology" location="file:/root/ontologies/Ontology/test.owl"/>
 	</baseOntologies>
 
 	<serviceProvider name="ssCom" type="Company" >
@@ -23,7 +23,7 @@
 				<rule contribute="positive">
 					<constraint name="C1">
 						<subject type="Person">Tom</subject>
-						<verb>isLocated</verb>
+						<verb>locatedIn</verb>
 						<object type="Room">Seoul</object>
 					</constraint>
 				</rule>
