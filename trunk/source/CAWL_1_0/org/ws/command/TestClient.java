@@ -12,7 +12,7 @@ import org.apache.axis2.client.ServiceClient;
 
 
 public class TestClient {
-	private static EndpointReference targetEPR = new EndpointReference("http://203.253.23.56:8080/Lego/services/Control");
+	private static EndpointReference targetEPR = new EndpointReference("http://localhost:8080/Sensor/services/Control");
 	private String namespace = "http://Services";
 	private String funcName = "displayLegoService";
 	private String serviceProvider = "ssCom";

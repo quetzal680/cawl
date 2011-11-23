@@ -86,7 +86,6 @@ public class ScenarioTest {
 				xmlReader.parse(xmlFile);
 
 				// 결과 확인
-				// 결과 확인
 				SaxUnParser unParser = new SaxUnParser();
 				uWDL = ((SaxContentHandler) contentHandler).getUWDL();
 				uWDL.accept(unParser);

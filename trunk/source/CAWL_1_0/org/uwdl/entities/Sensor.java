@@ -17,7 +17,7 @@ import org.apache.axis2.client.ServiceClient;
 
 
 public class Sensor {
-	private static EndpointReference targetEPR = new EndpointReference("http://203.253.23.84:8080/Axis2/services/LegoControl");
+	private static EndpointReference targetEPR = new EndpointReference("http://localhost:8080/Sensor/services/Sensor/");
 
     public static OMElement getSensorDataOMElement(String legoName) {
         OMFactory fac = OMAbstractFactory.getOMFactory();
