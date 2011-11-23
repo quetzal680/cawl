@@ -17,7 +17,7 @@
 		<initialize part="officeRoomNum"><from expression="313"/></initialize> 
 	</variable>	
 		
-	<activator name="TomFarmServiceActivator">
+	<activator name="DeliveryServiceActivator">
 		<condition expression="C1">
 			<context>
 				<rule contribute="positive">
@@ -30,17 +30,16 @@
 			</context>
 		</condition>
 
-		<activate flow="MorningCallFlow"/>
-		<activate flow="VentilatorFlow"/>
-		<activate flow="DoorFlow"/>
+		<activate flow="WarehouseFlow"/>
+		<activate flow="LegoFlow"/>
 	</activator>
 	
-	<flow name="MorningCallFlow">
+	<flow name="LampFlow">
 		<source>
 		</source>
 
-		<node name="MorningCall">
-			<condition expression="C1 and C2">
+		<node name="TurnOnLamp">
+			<condition expression="C1">
 				<context>
 					<rule contribute="positive">
 						<constraint name="C1">
@@ -48,72 +47,32 @@
 							<verb>hasAMPM</verb>
 							<object type="AMPM">AM</object>
 						</constraint>
-						<constraint name="C2">
-							<subject type="HumiditySensor">VinylhouseLightSensor</subject>
-							<verb>hasLight</verb>
-							<object type="Light">Bright</object>
-						</constraint>
 					</rule>
 				</context>
 			</condition>
 
-			<invoke serviceProvider="ssCom" portType="" operation="MorningCall" input=""/>
+			<invoke serviceProvider="ssCom" portType="" operation="TurnOnLamp" input=""/>
 		</node>
 
-		<link from="source" to="MorningCall"/>
-		<link from="MorningCall" to="sink" />
-
-		<sink>
-		</sink>
-	</flow>
-
-	<flow name="VentilatorFlow">
-		<source>
-		</source>
-
-		<node name="TurnOnVentilator">
+		<node name="TurnOffLamp">
 			<condition expression="C1">
 				<context>
 					<rule contribute="positive">
 						<constraint name="C1">
-							<subject type="HumiditySensor">VinylhouseHumiditySensor</subject>
-							<verb>hasHumidity</verb>
-							<object type="Humidity">60</object>
+							<subject type="Person">Seoul</subject>
+							<verb>hasAMPM</verb>
+							<object type="AMPM">AM</object>
 						</constraint>
 					</rule>
 				</context>
 			</condition>
 
-			<invoke serviceProvider="ssCom" portType="" operation="TurnOnVentilator" input=""/>
+			<invoke serviceProvider="ssCom" portType="" operation="TurnOffLamp" input=""/>
+
+			<synchronize>
+				<nSync name="CloseDoor" />
+			</synchronize>
 		</node>
-
-		<node name="TurnOffVentilator">
-			<condition expression="C1">
-				<context>
-					<rule contribute="positive">
-						<constraint name="C1">
-							<subject type="HumiditySensor">VinylhouseHumiditySensor</subject>
-							<verb>hasHumidity</verb>
-							<object type="Humidity">30</object>
-						</constraint>
-					</rule>
-				</context>
-			</condition>
-
-			<invoke serviceProvider="ssCom" portType="" operation="TurnOffVentilator" input=""/>
-		</node>
-
-		<link from="source" to="TurnOnVentilator"/>
-		<link from="TurnOnVentilator" to="TurnOffVentilator"/>
-		<link from="TurnOffVentilator" to="sink"/>
-
-		<sink>
-		</sink>
-	</flow>
-
-	<flow name="DoorFlow">
-		<source>
-		</source>
 
 		<node name="OpenDoor">
 			<condition expression="C1 and C2">
@@ -146,14 +105,79 @@
 
 			<invoke serviceProvider="ssCom" portType="" operation="CloseDoor" input=""/>
 		</node>
-		
+
+		<link from="source" to="TurnOnLamp"/>
+		<link from="TurnOnLamp" to="TurnOffLamp"/>
+		<link from="TurnOffLamp" to="sink" />
+
 		<link from="source" to="OpenDoor"/>
 		<link from="OpenDoor" to="CloseDoor"/>
-		<link from="CloseDoor" to="sink" />
 
 		<sink>
 		</sink>
 	</flow>
+
+	<flow name="LegoFlow">
+		<source>
+		</source>
+
+		<node name="Go">
+			<condition expression="C1">
+				<context>
+					<rule contribute="positive">
+						<constraint name="C1">
+							<subject type="Lego">DeliveryLego</subject>
+							<verb>hasCommand</verb>
+							<object type="Command">Go</object>
+						</constraint>
+					</rule>
+				</context>
+			</condition>
+
+			<invoke serviceProvider="ssCom" portType="" operation="GoLego" input=""/>
+		</node>
+
+		<node name="Stop">
+			<condition expression="C1">
+				<context>
+					<rule contribute="positive">
+						<constraint name="C1">
+							<subject type="Lego">DeliveryLego</subject>
+							<verb>hasProduct</verb>
+							<object type="Product">Can</object>
+						</constraint>
+					</rule>
+				</context>
+			</condition>
+
+			<invoke serviceProvider="ssCom" portType="" operation="TurnOffVentilator" input=""/>
+		</node>
+
+		<node name="Back">
+			<condition expression="C1">
+				<context>
+					<rule contribute="positive">
+						<constraint name="C1">
+							<subject type="HumiditySensor">VinylhouseHumiditySensor</subject>
+							<verb>hasHumidity</verb>
+							<object type="Humidity">30</object>
+						</constraint>
+					</rule>
+				</context>
+			</condition>
+
+			<invoke serviceProvider="ssCom" portType="" operation="TurnOffVentilator" input=""/>
+		</node>
+
+		<link from="source" to="TurnOnVentilator"/>
+		<link from="TurnOnVentilator" to="TurnOffVentilator"/>
+		<link from="TurnOffVentilator" to="sink"/>
+
+		<sink>
+		</sink>
+	</flow>
+
+
 </CAWL>
 
 
