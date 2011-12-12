@@ -4,7 +4,6 @@ import java.util.Calendar;
 
 import org.uwdl.entities.Entities;
 import org.uwdl.entities.Entity;
-import org.uwdl.entities.Sensor;
 import org.uwdl.parser.UnvalidVariableException;
 import org.uwdl.parser.ast.IConditionDescendant;
 import org.uwdl.parser.ast.IRuleDescendant;

@@ -6,6 +6,8 @@ import java.util.Random;
 import java.util.Vector;
 
 import org.uwdl.entities.ScenarioEntitySet;
+import org.uwdl.mapper.ContextComparator;
+import org.uwdl.mapper.ContextOntology;
 import org.uwdl.mapper.uWDLMapper;
 import org.uwdl.parser.ast.INodeDescendant;
 import org.uwdl.parser.ast.UActivate;
@@ -16,16 +18,17 @@ import org.uwdl.parser.ast.UNode;
 import org.uwdl.parser.ast.USink;
 import org.uwdl.parser.ast.USynchronize;
 import org.uwdl.scenario.exception.LinkAttributeException;
+import org.ws.command.Creater;
 
 public class UNodeThread extends Thread{
 	private final UNode node;
 	private Hashtable<String, UNodeThread> threads = null;
 	private Hashtable<String, Vector<String>> links = null;
-	private uWDLMapper mapper = null;
+	private ContextOntology contextOntology = null;
 	
-	public UNodeThread(UNode node) {
+	public UNodeThread(UNode node, ContextOntology contextOntology) {
 		this.node = node;
-		this.mapper = new uWDLMapper();
+		this.contextOntology = contextOntology;
 	}
 	
 	public void execute(Hashtable<String, UNodeThread> threads, Hashtable<String, Vector<String>> links) {
@@ -48,8 +51,17 @@ public class UNodeThread extends Thread{
 //    	}
     	
 //  		System.out.println(node.getName() + " constraint condition check : wait");
-//    	System.out.println(node.getName() + " constraint condition check : OK");
+    	System.out.println(node.getName() + " constraint condition check : OK");
     	
+		while ( !contextOntology.compare(node.getCondition()) ) {
+//			System.out.println(node.getName() + " constraint condition check");
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		System.out.println("--------------------- invoke ------------------------");
 		
 		// invoke 수행
    		for(INodeDescendant descendant : node.getINodeDescendant()) {
@@ -58,24 +70,16 @@ public class UNodeThread extends Thread{
 				if(invoke.getServiceProvider().equals("uwdl")) {
 					System.out.println("cawl subflow condition OK");
 					UFlow flow = ScenarioTest.flowSet.get(invoke.getOperation());
-					ScenarioFlow sub = new ScenarioFlow(flow, mapper);
+					ScenarioFlow sub = new ScenarioFlow(flow, contextOntology);
 					sub.start();
 				}
 				else {
 					System.out.println(((UInvoke)descendant));
-//    					Creater creater = new Creater(node, (UInvoke)descendant);
-//    					creater.invoke();
+					Creater creater = new Creater(node, (UInvoke)descendant, contextOntology);
+					creater.invoke();
 				}
 			}
    		}
-   		
-//try {
-//	if( node.getName().equals("N4") )
-//	Thread.sleep(10);
-//} catch (InterruptedException e) {
-//	// TODO Auto-generated catch block
-//	e.printStackTrace();
-//}
    		
 		System.out.println("\n[NODE] : <" + node.getName()  + "> State End");
 		
@@ -85,7 +89,7 @@ public class UNodeThread extends Thread{
 			if( nodeThread!=null ) {
 				synchronized (nodeThread) {
 					if( nodeThread.getState()==Thread.State.NEW ) {
-						System.out.println("<" + nodeThread.getNode().getName() + "> <" +nodeThread.getName()+">");
+						System.out.println("[NODE] : <" + nodeThread.getNode().getName() + "> <" +nodeThread.getName()+">");
 						nodeThread.execute(threads, links);
 					}
 				}
@@ -116,7 +120,7 @@ public class UNodeThread extends Thread{
 			UNodeThread nodeThread = threads.get(nSync.getName());
 			// 종료되지 않은 노드 존재
 			if (nodeThread.getState() != Thread.State.TERMINATED) {
-				System.out.println("[NODE] <" + node.getName() + "> <" +nodeThread.getNode().getName() + "> State not terminated");
+//				System.out.println("[NODE] <" + node.getName() + "> <" +nodeThread.getNode().getName() + "> State not terminated");
 				return false;
 			}
 		}

@@ -248,7 +248,9 @@ public class SaxContentHandler implements ContentHandler {
 				break;
 				
 			case INVOKE :
-				UInvoke invoke = new UInvoke(atts.getValue("serviceProvider"), 
+				UInvoke invoke = new UInvoke(atts.getValue("targetERP"),
+											 atts.getValue("namespace"),
+											 atts.getValue("serviceProvider"),
 											 atts.getValue("portType"), 
 											 atts.getValue("operation"),
 											 atts.getValue("input"),
