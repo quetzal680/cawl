@@ -8,6 +8,8 @@ import org.uwdl.parser.uWDLVisitor;
 
 public class UInvoke extends UElement implements INodeDescendant {
 	//attributes
+	private final String targetERP;
+	private final String namespace;
 	private final String serviceProvider;
 	private final String portType;
 	private final String operation;
@@ -16,8 +18,10 @@ public class UInvoke extends UElement implements INodeDescendant {
 	private final String subflow;
 
 	
-	public UInvoke(String serviceProvider, String portType, String operation, String input, String output, String subflow) {
+	public UInvoke(String targetERP, String namespace, String serviceProvider, String portType, String operation, String input, String output, String subflow) {
 		super(Tag.Invoke);
+		this.targetERP = targetERP;
+		this.namespace = namespace;
 		this.serviceProvider = serviceProvider;
 		this.portType = portType;
 		this.operation = operation;
@@ -28,6 +32,8 @@ public class UInvoke extends UElement implements INodeDescendant {
 	
 	public UInvoke(XMLAttributeMap map) throws uWDLMissingRequiredAttributeException {
 		super(Tag.Invoke);
+		this.targetERP = map.require("targetERP");
+		this.namespace = map.require("namespace");
 		this.serviceProvider = map.require("serviceProvider");
 		this.portType = map.require("portType");
 		this.operation = map.require("operation");
@@ -36,6 +42,14 @@ public class UInvoke extends UElement implements INodeDescendant {
 		this.subflow = map.optional("subflow");
 		
 		System.out.println("+++++++++++++++++++++++  " + serviceProvider);
+	}
+
+	public String getTargetERP() {
+		return targetERP;
+	}
+
+	public String getNamespace() {
+		return namespace;
 	}
 
 	public String getServiceProvider() {

@@ -19,6 +19,9 @@ import org.sspl.sax.SaxContentHandler;
 import org.sspl.sax.SaxUnParser;
 import org.uwdl.entities.ScenarioEntitySet;
 import org.uwdl.mapper.ContextComparator;
+import org.uwdl.mapper.ContextOntology;
+import org.uwdl.mapper.ContextUpdate;
+import org.uwdl.mapper.Sensor;
 import org.uwdl.mapper.uWDLMapper;
 import org.uwdl.parser.uWDLLexer;
 import org.uwdl.parser.uWDLParser;
@@ -92,12 +95,19 @@ public class ScenarioTest {
 				
 		        System.out.println("\n----------------- simulating start ------------------");
 		        //Hashtable<String, UFlow> flowSet = new Hashtable<String, UFlow>();
-		        ContextComparator comparator = null;
+		        ContextOntology contextOntology = null;
 		        for( UOntology uOntology : uWDL.getBaseOntologies().getOntologies()) {
-		        	comparator = new ContextComparator(uOntology.getLocation());	
+		        	contextOntology = new ContextOntology(uOntology);
 		        }
-		        uWDLMapper mapper = new uWDLMapper(); 
-		        ScenarioEntitySet sensorData = ScenarioEntitySet.getInstance();
+				Sensor sensorData = new Sensor(contextOntology);
+				sensorData.start();
+		        
+//ContextUpdate contextUpdate = new ContextUpdate();
+//contextUpdate.updateIndividual("DeliveryLego", "locatedIn", "Road");
+//contextUpdate.updateIndividual("DeliveryLego", "locatedIn", "Warehouse");
+		        
+//		        uWDLMapper mapper = new uWDLMapper(); 
+//		        ScenarioEntitySet sensorData = ScenarioEntitySet.getInstance();
 		        
 		        UActivator[] activator = uWDL.getActivators();
 		        UFlow[] flows = uWDL.getFlows();
@@ -115,7 +125,8 @@ public class ScenarioTest {
 		        
 		        
 		        System.out.println("activator condition check");
-		        if ( comparator.reasoner("Tom", "locatedIn", "Seoul") ) {
+		        
+		        if ( contextOntology.compare(activator[0].getCondition()) ) {
 		        	System.out.println("activator condition check OK");
 		        	
 		        	UActivate[] activate = activator[0].getActivates();
@@ -123,7 +134,7 @@ public class ScenarioTest {
 		        	
 		        	for(UActivate uActivate : activator[0].getActivates()) {
 			        	UFlow flow = flowSet.get(uActivate.getFlow());
-			        	ScenarioFlow scenarioFlow = new ScenarioFlow(flow, mapper);
+			        	ScenarioFlow scenarioFlow = new ScenarioFlow(flow, contextOntology);
 			        	scenarioFlow.start();
 		        	}
 		        }

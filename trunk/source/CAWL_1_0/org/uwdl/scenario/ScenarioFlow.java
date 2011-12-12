@@ -7,6 +7,8 @@ import java.util.Random;
 import java.util.Vector;
 
 import org.uwdl.entities.ScenarioEntitySet;
+import org.uwdl.mapper.ContextComparator;
+import org.uwdl.mapper.ContextOntology;
 import org.uwdl.mapper.uWDLMapper;
 import org.uwdl.parser.ast.INodeDescendant;
 import org.uwdl.parser.ast.UFlow;
@@ -26,31 +28,28 @@ public class ScenarioFlow extends Thread {
 	private UFlow flow = null;
 	private ArrayList<UNode> nodes = null;
 	private ScenarioEntitySet sensorData = null;
-	private uWDLMapper mapper = null;
 
 	private Hashtable<String, UNodeThread> threads = null;
 	
 	private Hashtable<String, Vector<String>> tmpLinks = null;
 
-	public ScenarioFlow(UFlow flow, uWDLMapper mapper) {
+	public ScenarioFlow(UFlow flow, ContextOntology contextOntology) {
 		System.out.println("\n[FLOW] <" + flow.getName() + "> State create");
 		
 		this.flow = flow;
-		this.mapper = mapper;
 		this.sensorData = ScenarioEntitySet.getInstance();
 		nodes = flow.getNodes();
 
 		threads = new Hashtable<String, UNodeThread>();
-		
 		tmpLinks = new Hashtable<String, Vector<String>>();
 
-		initThread();
+		initThread(contextOntology);
 		link();
 	}
 	
-	private void initThread() {
+	private void initThread(ContextOntology contextOntology) {
 		for (UNode uNode : nodes) {
-			UNodeThread nodeThread = new UNodeThread(uNode);
+			UNodeThread nodeThread = new UNodeThread(uNode, contextOntology);
 			threads.put(uNode.getName(), nodeThread);
 		}
 	}
@@ -85,8 +84,6 @@ public class ScenarioFlow extends Thread {
 			UNodeThread nodeThread = threads.get(toString);
 			nodeThread.execute(threads, tmpLinks);
 		}
-		
-		
 	}
 	
 	// print [source]->[input]

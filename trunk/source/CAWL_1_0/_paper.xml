@@ -2,7 +2,7 @@
 <CAWL name="MTRoomService" version="1.0.1" targetNamespace="RobotServiceTest">
 	<documentation>Meeting Room Services using LEGO Robots</documentation>
 	<baseOntologies>
-		<ontology namespace="http://ss.ssu.ac.kr/Ontology" location="file:/root/ontologies/Ontology/test.owl"/>
+		<ontology namespace="http://ss.ssu.ac.kr/Ontology.owl" location="file:/root/ontologies/Ontology/test.owl"/>
 	</baseOntologies>
 
 	<serviceProvider name="ssCom" type="Company" >
@@ -22,19 +22,19 @@
 			<context>
 				<rule contribute="positive">
 					<constraint name="C1">
-						<subject type="Person">Tom</subject>
+						<subject type="Person">Kim</subject>
 						<verb>locatedIn</verb>
-						<object type="Room">Seoul</object>
+						<object type="Location">Company</object>
 					</constraint>
 				</rule>
 			</context>
 		</condition>
 
-		<activate flow="WarehouseFlow"/>
-		<activate flow="LegoFlow"/>
+		<activate flow="DeliveryFlow"/>
+
 	</activator>
 	
-	<flow name="LampFlow">
+	<flow name="DeliveryFlow">
 		<source>
 		</source>
 
@@ -43,35 +43,19 @@
 				<context>
 					<rule contribute="positive">
 						<constraint name="C1">
-							<subject type="Person">Seoul</subject>
-							<verb>hasAMPM</verb>
-							<object type="AMPM">AM</object>
+							<subject type="Location">Warehouse</subject>
+							<verb>hasBrightness</verb>
+							<object type="Bright">Dark</object>
 						</constraint>
 					</rule>
 				</context>
 			</condition>
 
-			<invoke serviceProvider="ssCom" portType="" operation="TurnOnLamp" input=""/>
-		</node>
-
-		<node name="TurnOffLamp">
-			<condition expression="C1">
-				<context>
-					<rule contribute="positive">
-						<constraint name="C1">
-							<subject type="Person">Seoul</subject>
-							<verb>hasAMPM</verb>
-							<object type="AMPM">AM</object>
-						</constraint>
-					</rule>
-				</context>
-			</condition>
-
-			<invoke serviceProvider="ssCom" portType="" operation="TurnOffLamp" input=""/>
-
-			<synchronize>
-				<nSync name="CloseDoor" />
-			</synchronize>
+			<invoke targetERP="http://localhost:8080/Sensor/services/Warehouse/" 
+					namespace="http://Services" 
+					serviceProvider="ssCom"
+					operation="turnOnLamp"
+					input=""/>
 		</node>
 
 		<node name="OpenDoor">
@@ -79,15 +63,20 @@
 				<context>
 					<rule contribute="positive">
 						<constraint name="C1">
-							<subject type="TemperatureSensor">VinylHouseTemperatureSensor</subject>
-							<verb>hasTemperatureValue</verb>
-							<object type="Temperature">30</object>
+							<subject type="Lego">DeliveryLego</subject>
+							<verb>locatedIn</verb>
+							<object type="Location">WarehouseMainDoor</object>
 						</constraint>
 					</rule>
 				</context>
 			</condition>
 
-			<invoke serviceProvider="ssCom" portType="" operation="OpenDoor" input=""/>
+			<invoke targetERP="http://localhost:8080/Sensor/services/Warehouse/" 
+					namespace="http://Services" 
+					serviceProvider="ssCom"
+					operation="openDoor"
+					input=""/>
+
 		</node>
 
 		<node name="CloseDoor">
@@ -95,31 +84,21 @@
 				<context>
 					<rule contribute="positive">
 						<constraint name="C1">
-							<subject type="TemperatureSensor">VinylHouseTemperatureSensor</subject>
-							<verb>hasTemperatureValue</verb>
-							<object type="Temperature">20</object>
+							<subject type="Lego">DeliveryLego</subject>
+							<verb>locatedIn</verb>
+							<object type="Location">Road</object>
 						</constraint>
 					</rule>
 				</context>
 			</condition>
 
-			<invoke serviceProvider="ssCom" portType="" operation="CloseDoor" input=""/>
+			<invoke targetERP="http://localhost:8080/Sensor/services/Warehouse/" 
+					namespace="http://Services" 
+					serviceProvider="ssCom"
+					operation="closeDoor"
+					input=""/>
+
 		</node>
-
-		<link from="source" to="TurnOnLamp"/>
-		<link from="TurnOnLamp" to="TurnOffLamp"/>
-		<link from="TurnOffLamp" to="sink" />
-
-		<link from="source" to="OpenDoor"/>
-		<link from="OpenDoor" to="CloseDoor"/>
-
-		<sink>
-		</sink>
-	</flow>
-
-	<flow name="LegoFlow">
-		<source>
-		</source>
 
 		<node name="Go">
 			<condition expression="C1">
@@ -134,23 +113,32 @@
 				</context>
 			</condition>
 
-			<invoke serviceProvider="ssCom" portType="" operation="GoLego" input=""/>
+			<invoke targetERP="http://localhost:8080/Sensor/services/Delivery/" 
+					namespace="http://Services" 
+					serviceProvider="ssCom"
+					operation="go"
+					input=""/>
+
 		</node>
 
-		<node name="Stop">
+		<node name="PickUp">
 			<condition expression="C1">
 				<context>
 					<rule contribute="positive">
 						<constraint name="C1">
 							<subject type="Lego">DeliveryLego</subject>
-							<verb>hasProduct</verb>
-							<object type="Product">Can</object>
+							<verb>locatedIn</verb>
+							<object type="Can">Duyou</object>
 						</constraint>
 					</rule>
 				</context>
 			</condition>
 
-			<invoke serviceProvider="ssCom" portType="" operation="TurnOffVentilator" input=""/>
+			<invoke targetERP="http://localhost:8080/Sensor/services/Delivery/" 
+					namespace="http://Services" 
+					serviceProvider="ssCom"
+					operation="pickUp"
+					input=""/>
 		</node>
 
 		<node name="Back">
@@ -158,25 +146,61 @@
 				<context>
 					<rule contribute="positive">
 						<constraint name="C1">
-							<subject type="HumiditySensor">VinylhouseHumiditySensor</subject>
-							<verb>hasHumidity</verb>
-							<object type="Humidity">30</object>
+							<subject type="Lego">DeliveryLego</subject>
+							<verb>hasCan</verb>
+							<object type="Can">Duyou</object>
 						</constraint>
 					</rule>
 				</context>
 			</condition>
 
-			<invoke serviceProvider="ssCom" portType="" operation="TurnOffVentilator" input=""/>
+			<invoke targetERP="http://localhost:8080/Sensor/services/Delivery/" 
+					namespace="http://Services" 
+					serviceProvider="ssCom"
+					operation="back"
+					input=""/>
 		</node>
 
-		<link from="source" to="TurnOnVentilator"/>
-		<link from="TurnOnVentilator" to="TurnOffVentilator"/>
-		<link from="TurnOffVentilator" to="sink"/>
+		<node name="TurnOffLamp">
+			<condition expression="C1">
+				<context>
+					<rule contribute="positive">
+						<constraint name="C1">
+							<subject type="Location">Warehouse</subject>
+							<verb>hasBrightness</verb>
+							<object type="Bright">Bright</object>
+						</constraint>
+					</rule>
+				</context>
+			</condition>
+
+			<invoke targetERP="http://localhost:8080/Sensor/services/Warehouse/" 
+					namespace="http://Services" 
+					serviceProvider="ssCom"
+					operation="turnOffLamp"
+					input=""/>
+
+			<synchronize>
+				<nSync name="CloseDoor" />
+			</synchronize>
+		</node>
+
+		<link from="source" to="Go"/>
+		<link from="Go" to="PickUp"/>
+		<link from="PickUp" to="Back"/>
+		<link from="Back" to="sink"/>
+
+		<link from="source" to="TurnOnLamp"/>
+		<link from="TurnOnLamp" to="TurnOffLamp"/>
+		<link from="TurnOffLamp" to="sink" />
+
+		<link from="source" to="OpenDoor"/>
+		<link from="OpenDoor" to="CloseDoor"/>
+		<link from="CloseDoor" to="TurnOffLamp" />
 
 		<sink>
 		</sink>
 	</flow>
-
 
 </CAWL>
 
